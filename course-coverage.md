@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | g3-01-person-skeleton | F1,F4–F6,F9 | 寫人四段，單段單事 | teacher | 四段不可略過 |
 | g3-02-person-layers | F3–F6 | a/b 層次，末段感想比例 | teacher | 各段有自己的句子與配方 |
-| g3-03-object | F2,F6–F10 | 外觀、構造、功用與情感 | pencil | 狀物句子不混用人物 |
+| g3-03-object | F2,F6–F10 | 方位式（前→左→後→右）＋總分式，前三段 A、末段 B | pencil（〈我家的客廳〉，2026-10-31 由〈我的文具盒〉改，對應動畫「換你試試」題目） | 段落依方位分，事實句含方位詞 |
 | g3-04-explain-skeleton | F3–F8 | 客觀介紹，不強加感想結尾 | object-practice | 三部分解說牌練習 |
 | g3-05-explain-layers | F3–F8 | 擺設＋用途，準確、明白 | object-practice | 說明句不混入感想句 |
 | g3-06-explain-process | F1,F4–F8 | 歷程由開始到結束 | process-practice | 階段順序編排 |
@@ -19,17 +19,17 @@
 | g4-03-scene-skeleton | F3–F9 | 方位與文題相符 | campus | 四段維持校園主題 |
 | g4-04-scene-layers | F4–F10 | 感官細節、空間次序與感想 | campus | 具體景物句素材 |
 | g4-05-method-skeleton | F2–F7 | 問題、原因、作法、結論 | desk | 事理四段配方 |
-| g4-06-method-layers | F1–F4 | 理由、例子、作法、效果 | desk | 與記敘文 a/b 配方不同 |
+| g4-06-method-layers | F1–F4 | 問題＋麻煩、原因＋例子、首先／其次／最後、好處→重申 | desk（2026-10-31 起「看教學」第二集） | 第 3 段三步驟、第 4 段效果→主張，與本集示範一致 |
 | g4-07-book-report | F3–F5 | 資料、摘要、感想 | report-practice | 三部分報告；自編故事無出版資料 |
-| g5-01-howto-skeleton | F3,F7,U1 | 主張理由、方法、方法、重申 | environment | 採使用者核准的四段分法 |
-| g5-02-why-skeleton | F4–F8,U2 | 論點、兩個論證、重申 | reading | 理由、例子與小結配合 |
+| g5-01-howto-skeleton | F3,F7,U1 | 主張理由、方法一和二、方法三、重申 | environment | 2026-10-31 分組改為與示範相同（第 2 段兩個方法、第 3 段一個）；方法段的效果句本集未示範 |
+| g5-02-why-skeleton | F4–F8,U2 | 看法、理由＋例子、理由＋例子、重申＋怎麼做 | reading | 2026-10-31 拿掉中間段小結與首段理由，與本集示範一致（小結在 g6-07，未連） |
 | g6-01-person-focus-skeleton | F3–F9 | 主體回應題目重點 | brave | 勇敢事例不能只寫外貌 |
 | g6-02-person-focus-layers | F2–F5,F9 | 特性、舉例、感覺 | brave | 素材有適用段落 |
 | g6-03-event-focus-skeleton | F4–F7 | 果一、原因、經過、果二 | special | 保留倒敘／果因果的安排 |
 | g6-04-event-focus-layers | F2–F8 | 頭尾照應與感想 | special | 四段有對應具體句子 |
-| g6-05-talk-skeleton | F5–F9,U2 | 論點、論據、方法、重申 | humility | 採使用者已選骨架；名言僅用已查證來源 |
+| g6-05-talk-skeleton | F5–F9,U2 | 論點、例子→名言→小結、方法、重申 | humility | 2026-10-31 論據段改為例子在名言前，與示範一致；名言僅用已查證來源 |
 | g6-06-what-skeleton | F4,F5,F7,U3 | 書本道理、書例、生活例、重申 | book | 教學解讀是自編觀點，不冒稱寓言唯一寓意 |
-| g6-07-argument-layers | F1,F4–F6 | 理由、例子、小結與名言 | reading,book,humility | 素材含完整人、事、結果，非只換色 |
+| g6-07-argument-layers | F1,F4–F6 | 理由、例子、小結與名言 | book（遊戲只連 book） | 素材含完整人、事、結果，非只換色 |
 | g6-08-poem-scenery | F2–F4 | 分行分節，五感與想像 | poem-practice | 三節編排，非四段散文 |
 
 ## 邊界

@@ -13,7 +13,10 @@
 .battle-stage{height:100%;position:relative;overflow:hidden;border:1px solid #607d8d;border-radius:12px;background:linear-gradient(#183b4d,#26353f);display:grid;grid-template-rows:22% 58% 20%}
 .battle-title{display:grid;grid-template-columns:27% 46% 27%;align-items:center;gap:0;position:relative;z-index:5;padding:0 1.5%;min-height:0}
 .battle-meta,.enemy-intent{font-size:clamp(12px,1.05vw,16px);min-width:0;line-height:1.3}.enemy-intent{text-align:right}
-.question{text-align:center;font-size:clamp(18px,2vw,30px);font-weight:bold;line-height:1.3;overflow-wrap:anywhere}
+.question{text-align:center;font-size:clamp(18px,2vw,30px);font-weight:bold;line-height:1.3;overflow-wrap:anywhere;min-width:0}.question-title{display:block}.battle-stage.has-scaffold-hint .question{line-height:1.15}.weakness-note{display:block;font-size:14px;color:var(--muted);font-weight:normal;line-height:1.25}
+.scaffold-hint{display:inline-block;max-width:100%;margin:.12em auto 0;padding:.12em .4em;border-radius:6px;background:#e4efe0;color:#1b3028;font-size:clamp(12px,1vw,15px);font-weight:700;line-height:1.2;overflow-wrap:anywhere;vertical-align:top}
+.battle-stage.has-scaffold-hint{grid-template-rows:minmax(40%,max-content) minmax(0,1fr) 20%}
+@media(max-width:849px){.battle-stage.has-scaffold-hint{grid-template-rows:minmax(48%,max-content) minmax(0,1fr) 20%}.scaffold-hint{font-size:clamp(12px,2.8vw,15px)}}
 .battle-field{position:relative;min-height:0;background:linear-gradient(transparent 90%,#1b2d37 90%)}
 .actor{position:absolute;top:0;bottom:0;width:21%;display:flex;align-items:end;justify-content:center;z-index:2}.actor svg{height:100%;width:100%;max-width:210px;display:block}.hero-actor{left:4%}.enemy-actor{right:4%}
 .battle-vitals{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:0 3%;font-size:clamp(13px,1.15vw,18px);min-height:0;background:#172b35aa}.battle-vitals>div{width:26%;line-height:1.35}.battle-vitals>div:last-child{text-align:right}
@@ -298,7 +301,7 @@ const TEACHING_VIDEOS={
   trip:['g4-01-event-skeleton','g4-02-event-layers'],
   brave:['g6-01-person-focus-skeleton','g6-02-person-focus-layers'],
   special:['g6-03-event-focus-skeleton','g6-04-event-focus-layers'],
-  desk:['g4-05-method-skeleton'],
+  desk:['g4-05-method-skeleton','g4-06-method-layers'],
   environment:['g5-01-howto-skeleton'],
   reading:['g5-02-why-skeleton'],
   humility:['g6-05-talk-skeleton'],
@@ -382,74 +385,74 @@ const TOPICS=[
   },
   {
     "id": "pencil",
-    "topic": "我的文具盒",
+    "topic": "我家的客廳",
     "genre": "記敘文（狀物）",
     "paragraphs": [
       {
-        "label": "外觀",
+        "label": "客廳的整體",
         "units": [
           [
             "a",
-            "我的文具盒是深藍色的，盒蓋上有一顆白色星星。"
+            "我家的客廳在一進門的地方，是全家人最常待的空間。"
           ],
           [
             "a",
-            "盒子的四個角圓圓的，握在手裡很平滑。"
+            "客廳裡的家具不多，擺得整整齊齊。"
           ],
           [
             "b",
-            "這個簡單的樣子，讓我越看越喜歡。"
+            "一走進客廳，我就覺得好輕鬆。"
           ]
         ]
       },
       {
-        "label": "盒內的安排",
+        "label": "前面和左邊",
         "units": [
           [
             "a",
-            "打開盒蓋，左邊躺著鉛筆，右邊放著橡皮擦。"
+            "客廳前面是一臺電視，下面的矮櫃放著遙控器和相簿。"
           ],
           [
             "a",
-            "中間的小隔板把尺和筆分開，找東西很方便。"
+            "左邊有一扇大窗戶，窗臺上擺著兩盆綠色的小盆栽。"
           ],
           [
             "b",
-            "看到盒子裡整整齊齊的，我的心也安定下來。"
+            "午後坐在窗邊曬太陽，心裡暖洋洋的。"
           ]
         ]
       },
       {
-        "label": "使用的經過",
+        "label": "後面和右邊",
         "units": [
           [
             "a",
-            "上美術課時，我從文具盒拿出彩色鉛筆。"
+            "客廳後面是一張長長的沙發，上面放著三個軟軟的抱枕。"
           ],
           [
             "a",
-            "畫完後，我把筆一枝枝放回原來的位置。"
+            "右邊靠牆是一個書櫃，裝滿了爸爸和我的書。"
           ],
           [
             "b",
-            "文具盒陪我完成作品，像個安靜的小幫手。"
+            "窩在沙發上看書，是我最喜歡的時光。"
           ]
         ]
       },
       {
-        "label": "珍惜",
+        "label": "我對客廳的感覺",
         "units": [
           [
             "a",
-            "這個文具盒已經陪我度過好幾個學期。"
+            "每天晚上，我們一家人都會在客廳聊天。"
           ],
           [
             "b",
-            "我很珍惜它帶給我的方便與回憶。"
+            "我好喜歡這個溫暖又舒服的客廳。"
           ],
           [
             "b",
-            "我希望好好照顧它，讓它繼續陪我學習。"
+            "希望我們一家人能一直在這裡快樂地生活。"
           ]
         ]
       }
@@ -798,8 +801,8 @@ const TOPICS=[
             "其次，把常用文具放進筆筒，其他物品收進抽屜。"
           ],
           [
-            "effect",
-            "分類後再放回去，就能留下清楚的讀寫區。"
+            "step",
+            "最後，每次用完東西，馬上放回原來的位置。"
           ]
         ]
       },
@@ -807,12 +810,12 @@ const TOPICS=[
         "label": "結論",
         "units": [
           [
-            "claim",
-            "整理書桌的重點，是分類並讓物品各有位置。"
+            "effect",
+            "東西各有位置，要用的書和筆一下子就找到。"
           ],
           [
-            "effect",
-            "每次使用後放回原處，便能維持方便的工作空間。"
+            "claim",
+            "整理書桌的重點，是分類並讓物品各有位置。"
           ]
         ]
       }
@@ -837,28 +840,15 @@ const TOPICS=[
         ]
       },
       {
-        "label": "方法一",
+        "label": "方法一和二",
         "units": [
           [
             "step",
-            "首先，外出時帶自己的水壺，減少一次性容器。"
-          ],
-          [
-            "effect",
-            "少用一個拋棄式杯子，就能少製造一份垃圾。"
-          ]
-        ]
-      },
-      {
-        "label": "方法二",
-        "units": [
-          [
-            "step",
-            "其次，離開房間時隨手關燈，珍惜能源。"
+            "首先，離開房間時隨手關燈，珍惜能源。"
           ],
           [
             "step",
-            "也可以做好分類，讓可回收的物品再次被利用。"
+            "其次，做好垃圾分類，讓可回收的物品再次被利用。"
           ],
           [
             "effect",
@@ -867,15 +857,28 @@ const TOPICS=[
         ]
       },
       {
-        "label": "重申主張",
+        "label": "方法三",
+        "units": [
+          [
+            "step",
+            "最後，外出時帶自己的水壺，減少一次性容器。"
+          ],
+          [
+            "effect",
+            "少用一個拋棄式杯子，就能少製造一份垃圾。"
+          ]
+        ]
+      },
+      {
+        "label": "再說一次主張",
         "units": [
           [
             "claim",
             "保護環境需要每個人持續參與。"
           ],
           [
-            "step",
-            "讓我們從自備水壺、隨手關燈與分類開始。"
+            "claim",
+            "只要每天做好這些小事，我們的環境就會越來越好。"
           ]
         ]
       }
@@ -891,11 +894,11 @@ const TOPICS=[
         "units": [
           [
             "claim",
-            "讀書能幫助我們認識更寬廣的世界。"
+            "讀書，就是從書中認識別人的經驗與想法。"
           ],
           [
-            "reason",
-            "書中記錄了許多人經歷的事情與思考。"
+            "claim",
+            "我認為，讀書能幫助我們認識更寬廣的世界。"
           ]
         ]
       },
@@ -909,10 +912,6 @@ const TOPICS=[
           [
             "example",
             "我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。"
-          ],
-          [
-            "summary",
-            "可見閱讀能讓我們看見更多原本忽略的事物。"
           ]
         ]
       },
@@ -926,10 +925,6 @@ const TOPICS=[
           [
             "example",
             "同學讀了關於搬家的故事後，主動陪伴剛轉學的新同學，讓他不再孤單。"
-          ],
-          [
-            "summary",
-            "因此，閱讀不只增加知識，也能帶來體諒。"
           ]
         ]
       },
@@ -970,12 +965,12 @@ const TOPICS=[
         "label": "論據",
         "units": [
           [
-            "quote",
-            "《尚書》說：「滿招損，謙受益。」"
-          ],
-          [
             "example",
             "小安雖然跑得快，仍向隊友請教交棒，練習後全隊的接力更順利。"
+          ],
+          [
+            "quote",
+            "《尚書》說：「滿招損，謙受益。」"
           ],
           [
             "summary",
@@ -993,10 +988,6 @@ const TOPICS=[
           [
             "step",
             "發現自己做錯時，承認不足並重新練習。"
-          ],
-          [
-            "effect",
-            "這樣就能把別人的提醒，變成成長的機會。"
           ]
         ]
       },
@@ -1008,8 +999,8 @@ const TOPICS=[
             "謙虛不是否定自己，而是保持願意學習的心。"
           ],
           [
-            "step",
-            "讓我們珍惜自己的長處，也尊重別人的本領。"
+            "claim",
+            "只要保持謙虛，就能一天比一天進步。"
           ]
         ]
       }
@@ -1189,6 +1180,97 @@ const PRACTICES=[
   }
 ];
 for(const t of TOPICS){t.paragraphs.forEach(p=>p.pattern=p.units.map(x=>x[0]));t.bank=t.paragraphs.flatMap((p,i)=>p.units.map(([kind,text],j)=>({id:t.id+"-"+i+"-"+j,topicId:t.id,kind,text,allowed:[i]})));}
+const PENCIL_LEGACY_SENTENCE_PAIRS=Object.freeze([
+  Object.freeze({bankId:'pencil-0-0',old:'我的文具盒是深藍色的，盒蓋上有一顆白色星星。',next:'我家的客廳在一進門的地方，是全家人最常待的空間。'}),
+  Object.freeze({bankId:'pencil-0-1',old:'盒子的四個角圓圓的，握在手裡很平滑。',next:'客廳裡的家具不多，擺得整整齊齊。'}),
+  Object.freeze({bankId:'pencil-0-2',old:'這個簡單的樣子，讓我越看越喜歡。',next:'一走進客廳，我就覺得好輕鬆。'}),
+  Object.freeze({bankId:'pencil-1-0',old:'打開盒蓋，左邊躺著鉛筆，右邊放著橡皮擦。',next:'客廳前面是一臺電視，下面的矮櫃放著遙控器和相簿。'}),
+  Object.freeze({bankId:'pencil-1-1',old:'中間的小隔板把尺和筆分開，找東西很方便。',next:'左邊有一扇大窗戶，窗臺上擺著兩盆綠色的小盆栽。'}),
+  Object.freeze({bankId:'pencil-1-2',old:'看到盒子裡整整齊齊的，我的心也安定下來。',next:'午後坐在窗邊曬太陽，心裡暖洋洋的。'}),
+  Object.freeze({bankId:'pencil-2-0',old:'上美術課時，我從文具盒拿出彩色鉛筆。',next:'客廳後面是一張長長的沙發，上面放著三個軟軟的抱枕。'}),
+  Object.freeze({bankId:'pencil-2-1',old:'畫完後，我把筆一枝枝放回原來的位置。',next:'右邊靠牆是一個書櫃，裝滿了爸爸和我的書。'}),
+  Object.freeze({bankId:'pencil-2-2',old:'文具盒陪我完成作品，像個安靜的小幫手。',next:'窩在沙發上看書，是我最喜歡的時光。'}),
+  Object.freeze({bankId:'pencil-3-0',old:'這個文具盒已經陪我度過好幾個學期。',next:'每天晚上，我們一家人都會在客廳聊天。'}),
+  Object.freeze({bankId:'pencil-3-1',old:'我很珍惜它帶給我的方便與回憶。',next:'我好喜歡這個溫暖又舒服的客廳。'}),
+  Object.freeze({bankId:'pencil-3-2',old:'我希望好好照顧它，讓它繼續陪我學習。',next:'希望我們一家人能一直在這裡快樂地生活。'})
+]);
+function migratePencilLegacyBattle(battle){
+  if(!battle||battle.topicId!=='pencil')return;
+  for(const pile of ['hand','draw','discard','draft']){
+    if(!Array.isArray(battle[pile]))continue;
+    for(const card of battle[pile]){
+      if(!card||card.topicId!=='pencil'||card.type!=='material'||!PENCIL_LEGACY_SENTENCE_PAIRS.some(pair=>pair.old===card.sentence))continue;
+      const pair=PENCIL_LEGACY_SENTENCE_PAIRS.find(item=>item.bankId===card.bankId);
+      if(pair)card.sentence=pair.next;
+    }
+  }
+}
+const freezeLegacyTopicRows=rows=>Object.freeze(rows.map(([old,bankId,kind,sentence,paragraph])=>Object.freeze({old,bankId,kind,sentence,allowed:Object.freeze([paragraph])})));
+const LEGACY_TOPIC_SENTENCE_MAPS=Object.freeze({
+  desk:freezeLegacyTopicRows([
+    ["書桌整理得有條理，才能留下足夠的工作空間。","desk-0-0","claim","書桌整理得有條理，才能留下足夠的工作空間。",0],
+    ["物品若散在桌上，找書和寫字都容易受影響。","desk-0-1","reason","物品若散在桌上，找書和寫字都容易受影響。",0],
+    ["把不常用的東西留在桌面，是雜亂的原因之一。","desk-1-0","reason","把不常用的東西留在桌面，是雜亂的原因之一。",1],
+    ["例如舊講義和空盒堆在桌角，會擋住常用的課本。","desk-1-1","example","例如舊講義和空盒堆在桌角，會擋住常用的課本。",1],
+    ["首先，把桌面物品全部拿下來，依用途分類。","desk-2-0","step","首先，把桌面物品全部拿下來，依用途分類。",2],
+    ["其次，把常用文具放進筆筒，其他物品收進抽屜。","desk-2-1","step","其次，把常用文具放進筆筒，其他物品收進抽屜。",2],
+    ["分類後再放回去，就能留下清楚的讀寫區。","desk-2-2","step","最後，每次用完東西，馬上放回原來的位置。",2],
+    ["整理書桌的重點，是分類並讓物品各有位置。","desk-3-1","claim","整理書桌的重點，是分類並讓物品各有位置。",3],
+    ["每次使用後放回原處，便能維持方便的工作空間。","desk-3-1","claim","整理書桌的重點，是分類並讓物品各有位置。",3]
+  ]),
+  environment:freezeLegacyTopicRows([
+    ["保護環境應該從每天的小事做起。","environment-0-0","claim","保護環境應該從每天的小事做起。",0],
+    ["因為我們使用資源的方式，會影響共同生活的地方。","environment-0-1","reason","因為我們使用資源的方式，會影響共同生活的地方。",0],
+    ["首先，外出時帶自己的水壺，減少一次性容器。","environment-2-0","step","最後，外出時帶自己的水壺，減少一次性容器。",2],
+    ["少用一個拋棄式杯子，就能少製造一份垃圾。","environment-2-1","effect","少用一個拋棄式杯子，就能少製造一份垃圾。",2],
+    ["其次，離開房間時隨手關燈，珍惜能源。","environment-1-0","step","首先，離開房間時隨手關燈，珍惜能源。",1],
+    ["也可以做好分類，讓可回收的物品再次被利用。","environment-1-1","step","其次，做好垃圾分類，讓可回收的物品再次被利用。",1],
+    ["節約能源與資源，能減輕環境的負擔。","environment-1-2","effect","節約能源與資源，能減輕環境的負擔。",1],
+    ["保護環境需要每個人持續參與。","environment-3-0","claim","保護環境需要每個人持續參與。",3],
+    ["讓我們從自備水壺、隨手關燈與分類開始。","environment-3-1","claim","只要每天做好這些小事，我們的環境就會越來越好。",3]
+  ]),
+  reading:freezeLegacyTopicRows([
+    ["讀書能幫助我們認識更寬廣的世界。","reading-0-1","claim","我認為，讀書能幫助我們認識更寬廣的世界。",0],
+    ["書中記錄了許多人經歷的事情與思考。","reading-0-1","claim","我認為，讀書能幫助我們認識更寬廣的世界。",0],
+    ["讀書可以補充生活中還沒有接觸過的知識。","reading-1-0","reason","讀書可以補充生活中還沒有接觸過的知識。",1],
+    ["我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。","reading-1-1","example","我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。",1],
+    ["可見閱讀能讓我們看見更多原本忽略的事物。","reading-1-1","example","我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。",1],
+    ["讀書也能幫助我們理解別人的處境。","reading-2-0","reason","讀書也能幫助我們理解別人的處境。",2],
+    ["同學讀了關於搬家的故事後，主動陪伴剛轉學的新同學，讓他不再孤單。","reading-2-1","example","同學讀了關於搬家的故事後，主動陪伴剛轉學的新同學，讓他不再孤單。",2],
+    ["因此，閱讀不只增加知識，也能帶來體諒。","reading-2-1","example","同學讀了關於搬家的故事後，主動陪伴剛轉學的新同學，讓他不再孤單。",2],
+    ["讀書的重要，在於讓眼界與心胸一起成長。","reading-3-0","claim","讀書的重要，在於讓眼界與心胸一起成長。",3],
+    ["我們可以每天留一點時間，選一本適合自己的書。","reading-3-1","step","我們可以每天留一點時間，選一本適合自己的書。",3]
+  ]),
+  humility:freezeLegacyTopicRows([
+    ["謙虛能讓人看見自己的不足，願意繼續學習。","humility-0-0","claim","謙虛能讓人看見自己的不足，願意繼續學習。",0],
+    ["如果總覺得自己最好，就容易忽略別人的提醒。","humility-0-1","reason","如果總覺得自己最好，就容易忽略別人的提醒。",0],
+    ["《尚書》說：「滿招損，謙受益。」","humility-1-1","quote","《尚書》說：「滿招損，謙受益。」",1],
+    ["小安雖然跑得快，仍向隊友請教交棒，練習後全隊的接力更順利。","humility-1-0","example","小安雖然跑得快，仍向隊友請教交棒，練習後全隊的接力更順利。",1],
+    ["願意學習別人的長處，正能幫助自己進步。","humility-1-2","summary","願意學習別人的長處，正能幫助自己進步。",1],
+    ["遇到不同意見時，先聽完對方的理由。","humility-2-0","step","遇到不同意見時，先聽完對方的理由。",2],
+    ["發現自己做錯時，承認不足並重新練習。","humility-2-1","step","發現自己做錯時，承認不足並重新練習。",2],
+    ["這樣就能把別人的提醒，變成成長的機會。","humility-2-1","step","發現自己做錯時，承認不足並重新練習。",2],
+    ["謙虛不是否定自己，而是保持願意學習的心。","humility-3-0","claim","謙虛不是否定自己，而是保持願意學習的心。",3],
+    ["讓我們珍惜自己的長處，也尊重別人的本領。","humility-3-1","claim","只要保持謙虛，就能一天比一天進步。",3]
+  ])
+});
+function migrateAlignedLegacyBattle(battle){
+  const pairs=LEGACY_TOPIC_SENTENCE_MAPS[battle?.topicId];
+  if(!pairs)return;
+  const byOldSentence=new Map(pairs.map(pair=>[pair.old,pair]));
+  for(const pile of ['hand','draw','discard','draft']){
+    if(!Array.isArray(battle[pile]))continue;
+    for(const card of battle[pile]){
+      if(!card||card.topicId!==battle.topicId||card.type!=='material')continue;
+      const replacement=byOldSentence.get(card.sentence);
+      if(!replacement)continue;
+      card.bankId=replacement.bankId;
+      card.kind=replacement.kind;
+      card.sentence=replacement.sentence;
+      card.allowed=[...replacement.allowed];
+    }
+  }
+}
 const DRAFT_LIMIT=3;
 const SAVE_KEY='pen-spire-save-v2';
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -1244,6 +1326,8 @@ function validRun(r){
   if(r.view==='battle'){
     const b=r.battle,t=TOPICS.find(t=>t.id===b?.topicId);if(!t||!['monster','elite','boss'].includes(b.type)||!int(b.phase,0,4)||!int(b.energy,0,9)||!int(b.block,0,1000)||!int(b.round,1,10000)||!b.enemy||!int(b.enemy.hp,0,1000)||!int(b.enemy.maxHp,1,1000)||!int(b.enemy.attack,1,50)||!Array.isArray(b.required)||!b.required.every(p=>int(p,0,3))||!Array.isArray(b.completed)||!b.completed.every(p=>p&&int(p.index,0,3)&&typeof p.text==='string'))return false;
     if(['helpPaid','helpDebt','defeated','defeatWatched'].some(k=>Object.prototype.hasOwnProperty.call(b,k)&&typeof b[k]!=='boolean')||Object.prototype.hasOwnProperty.call(b,'failedSubmits')&&!int(b.failedSubmits,0,10000))return false;
+    if(Object.prototype.hasOwnProperty.call(b,'inkBase')&&(!Number.isInteger(b.inkBase)||b.inkBase<0))return false;
+    if(Object.prototype.hasOwnProperty.call(b,'scaffold')){if(!b.scaffold||typeof b.scaffold!=='object'||Array.isArray(b.scaffold))return false;for(const [key,state] of Object.entries(b.scaffold))if(!/^[0-3]$/.test(key)||!state||typeof state!=='object'||Array.isArray(state)||!Number.isInteger(state.fails)||state.fails<0||typeof state.watched!=='boolean'||!int(state.level,0,3))return false;}
     for(const pile of ['hand','draw','discard','draft'])if(!Array.isArray(b[pile])||b[pile].length>100||!b[pile].every(c=>c&&typeof c.id==='string'&&c.topicId===t.id&&['material','defend','focus','strike','heal'].includes(c.type)&&int(c.level,0,3)&&(!c.bankId||t.bank.some(u=>u.id===c.bankId))&&(!Object.prototype.hasOwnProperty.call(c,'drawApplied')||typeof c.drawApplied==='boolean')&&(!Object.prototype.hasOwnProperty.call(c,'appliedBlock')||int(c.appliedBlock,0,1000))))return false;
     if(b.hand.length>10||b.draft.length>6||!int(b.target,0,3)||!['noteUsed','mulliganUsed','firstMaterial'].every(k=>typeof b[k]==='boolean')||new Set(b.completed.map(p=>p.index)).size!==b.completed.length)return false;
     if(b.type==='boss'&&(b.phase>3||b.completed.length!==b.phase||!b.completed.every(p=>p.index<b.phase)))return false;
@@ -1255,7 +1339,7 @@ function validRun(r){
 const DEMO_DELAYS={slow:1500,mid:800,fast:300},DEMO_HELP_HOLD={slow:6000,mid:4000,fast:2000},DEMO_STEP_LIMIT=3000;
 class Game{
   constructor(storage=null){this.storage=storage;this.storageOK=!!storage;this.meta=freshMeta();this.run=null;this.selected='hero';this.view='menu';this.notice='選擇角色，從一句話開始爬塔。';this.noticeType='info';this.battleLog=[];this.noticeEvent=false;this.onChange=null;this.onSound=null;this.practice=null;this.helpOpen=false;this.demo=null;this.demoStash=null;this.demoBattleLogStash=null;this.load();this.noticeSnapshot=this.notice;}
-  load(){if(!this.storage)return;try{const raw=this.storage.getItem(SAVE_KEY);if(!raw)return;const s=JSON.parse(raw);if(s.version!==2||!s.meta||!int(s.meta.ink)||!int(s.meta.wins)||typeof s.meta.hermit!=='boolean'||!int(s.meta.hpLevel,0,5)||!META_LEVEL_KEYS.every(key=>!Object.prototype.hasOwnProperty.call(s.meta,key)||int(s.meta[key],0,3))||!s.meta.practices||typeof s.meta.practices!=='object'||Array.isArray(s.meta.practices)||(s.run!==null&&!validRun(s.run)))throw Error('format');this.meta={...freshMeta(),...s.meta};this.run=s.run;if(this.run?.status==='active'&&this.run.view==='battle'&&this.run.battle?.defeated)this.view='battle';this.selected=CHARACTERS.some(c=>c.id===s.selected)?s.selected:'hero';if(!this.unlocked(this.selected))this.selected='hero';this.notice=this.run?.status==='active'?'上次的冒險已保存，可以繼續。':'歡迎回到筆尖尖塔。';}catch{this.storageOK=false;this.notice='原存檔無法讀取。本次不覆寫原存檔，仍可暫時遊玩。';this.noticeType='warn';}}
+  load(){if(!this.storage)return;try{const raw=this.storage.getItem(SAVE_KEY);if(!raw)return;const s=JSON.parse(raw);if(s.run?.battle?.topicId==='pencil')migratePencilLegacyBattle(s.run.battle);migrateAlignedLegacyBattle(s.run?.battle);if(s.version!==2||!s.meta||!int(s.meta.ink)||!int(s.meta.wins)||typeof s.meta.hermit!=='boolean'||!int(s.meta.hpLevel,0,5)||!META_LEVEL_KEYS.every(key=>!Object.prototype.hasOwnProperty.call(s.meta,key)||int(s.meta[key],0,3))||!s.meta.practices||typeof s.meta.practices!=='object'||Array.isArray(s.meta.practices)||(s.run!==null&&!validRun(s.run)))throw Error('format');this.meta={...freshMeta(),...s.meta};this.run=s.run;if(this.run?.status==='active'&&this.run.view==='battle'&&this.run.battle?.defeated)this.view='battle';this.selected=CHARACTERS.some(c=>c.id===s.selected)?s.selected:'hero';if(!this.unlocked(this.selected))this.selected='hero';this.notice=this.run?.status==='active'?'上次的冒險已保存，可以繼續。':'歡迎回到筆尖尖塔。';}catch{this.storageOK=false;this.notice='原存檔無法讀取。本次不覆寫原存檔，仍可暫時遊玩。';this.noticeType='warn';}}
   save(){if(this.demo||trialEnabled())return true;if(!this.storageOK)return false;try{this.storage.setItem(SAVE_KEY,JSON.stringify({version:2,meta:this.meta,run:this.run,selected:this.selected}));return true;}catch{this.storageOK=false;this.notice='無法保存進度，這次仍可遊玩；關閉後可能無法保留。';this.noticeType='warn';return false;}}
   changed(){this.save();const noticeChanged=this.notice!==this.noticeSnapshot||this.noticeEvent;this.noticeSnapshot=this.notice;this.noticeEvent=false;const b=this.run?.battle;if(noticeChanged&&this.view==='battle'&&b&&this.notice){const last=this.battleLog.at(-1);if(!last||last.round!==b.round||last.text!==this.notice){this.battleLog.push({round:b.round,type:this.noticeType,text:this.notice});if(this.battleLog.length>80)this.battleLog.splice(0,this.battleLog.length-80);}}this.onChange?.();}
   feedbackHistoryHtml(){const escText=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));if(this.view!=='battle'||!this.run?.battle||!this.battleLog.length)return `<p class="notice">${escText(this.notice)}</p>`;const rounds=[...new Set(this.battleLog.map(item=>item.round))].sort((a,b)=>b-a),latest=this.battleLog.length-1;return rounds.map(round=>`<section class="feedback-round"><h3>第 ${round} 回合</h3>${this.battleLog.map((item,index)=>item.round===round?`<p class="notice${item.type==='warn'||item.type==='good'?' '+item.type:''}">${escText(item.text)}${index===latest?' <b class="feedback-latest">最新</b>':''}</p>`:'').join('')}</section>`).join('');}
@@ -1341,11 +1425,11 @@ class Game{
   resume(){if(!this.run)return false;this.view=this.run.view;this.changed();return true;}
   menu(){if(this.demo)return this.endDemo();this.view='menu';this.changed();}
   node(id){return this.run?.map.flat().find(n=>n.id===id);}
-  enterNode(id){const r=this.run;if(!r||r.status!=='active'||r.view!=='map'||!r.available.includes(id))return false;const n=this.node(id);r.current=id;r.available=[];r.visited.push(id);r.earnedInk++;r.shopBought=[];if(['monster','elite','boss'].includes(n.type))this.startBattle(n.type);else{r.view=n.type;this.view=n.type;this.notice=n.type==='camp'?'休息一下，選擇一項營火行動。':'用書籤幣替下一場戰鬥作準備。';this.changed();}return true;}
+  enterNode(id){const r=this.run;if(!r||r.status!=='active'||r.view!=='map'||!r.available.includes(id))return false;const n=this.node(id),inkBase=r.earnedInk;r.current=id;r.available=[];r.visited.push(id);r.earnedInk++;r.shopBought=[];if(['monster','elite','boss'].includes(n.type))this.startBattle(n.type,null,inkBase);else{r.view=n.type;this.view=n.type;this.notice=n.type==='camp'?'休息一下，選擇一項營火行動。':'用書籤幣替下一場戰鬥作準備。';this.changed();}return true;}
   completeNode(){const r=this.run;if(!r||r.status!=='active'||!['camp','shop','reward'].includes(r.view))return false;r.available=[...this.node(r.current).targets];r.view='map';r.battle=null;r.reward=null;this.view='map';this.tell('下一條路已亮起，選擇你想前進的方向。');return true;}
   topic(){return TOPICS.find(t=>t.id===this.run?.battle?.topicId);}
   teachingVideos(){const folders=TEACHING_VIDEOS[this.topic()?.id]||[];return folders.map((folder,index)=>({folder,label:index===0?'骨架：四段怎麼排':'長肉：一段裡怎麼排',url:ANIMATION_BASE+folder+'/'}));}
-  startBattle(type,topicId=null){const r=this.run;if(!r||r.status!=='active')return false;this.battleLog=[];this.noticeSnapshot=null;this.noticeEvent=false;let t=TOPICS.find(t=>t.id===topicId);if(!t){let i=Math.floor(this.random()*TOPICS.length);if(TOPICS[i].id===r.lastTopic)i=(i+1)%TOPICS.length;t=TOPICS[i];}r.lastTopic=t.id;const pool=shuffled(t.bank,()=>this.random());
+  startBattle(type,topicId=null,inkBase=this.run?.earnedInk??0){const r=this.run;if(!r||r.status!=='active')return false;this.battleLog=[];this.noticeSnapshot=null;this.noticeEvent=false;let t=TOPICS.find(t=>t.id===topicId);if(!t){let i=Math.floor(this.random()*TOPICS.length);if(TOPICS[i].id===r.lastTopic)i=(i+1)%TOPICS.length;t=TOPICS[i];}r.lastTopic=t.id;const pool=shuffled(t.bank,()=>this.random());
     const order=shuffled([0,1,2,3],()=>this.random()),required=type==='boss'?[0,1,2,3]:order.slice(0,type==='elite'?2:1);
     const usedSentences=new Set(),priority=[];
     for(const index of(type==='boss'?[0,1,2,3]:required)){
@@ -1357,7 +1441,7 @@ class Game{
     let m=0,priorityIndex=0;
     const cards=r.deck.map(d=>{const base={...d,topicId:t.id,damageSpent:false};if(d.type==='material'){let s=priorityIndex<priority.length?priority[priorityIndex++]:null;if(!s){s=pool.find(sentence=>!usedSentences.has(sentence.id));if(s)usedSentences.add(s.id);else s=pool[m%pool.length];}m++;return{...base,bankId:s.id,kind:s.kind,sentence:s.text,allowed:s.allowed};}return{...base,sentence:`先把〈${t.topic}〉的下一句想清楚。`};});
     const floor=this.node(r.current)?.floor||0;const maxHp=type==='boss'?112:type==='elite'?54+Math.floor(floor/2)*2:30+Math.floor(floor/2)*2;
-    r.battle={type,topicId:t.id,required,enemy:{hp:maxHp,maxHp,attack:type==='boss'?8:type==='elite'?6:4},phase:0,completed:[],round:1,energy:this.energyLimit(1),failedSubmits:0,helpPaid:false,helpDebt:false,defeated:false,defeatWatched:false,block:0,hand:[],draw:shuffled(cards,()=>this.random()),discard:[],draft:[],target:type==='boss'?0:required[0],noteUsed:false,mulliganUsed:false,firstMaterial:false};r.view='battle';this.view='battle';this.draw(5);this.notice='讀題、選句，把想法放進草稿。';this.noticeType='info';this.changed();return true;
+    r.battle={type,topicId:t.id,required,enemy:{hp:maxHp,maxHp,attack:type==='boss'?8:type==='elite'?6:4},phase:0,completed:[],round:1,energy:this.energyLimit(1),failedSubmits:0,helpPaid:false,helpDebt:false,defeated:false,defeatWatched:false,inkBase:Number.isInteger(inkBase)&&inkBase>=0?Math.min(inkBase,r.earnedInk):r.earnedInk,scaffold:{},block:0,hand:[],draw:shuffled(cards,()=>this.random()),discard:[],draft:[],target:type==='boss'?0:required[0],noteUsed:false,mulliganUsed:false,firstMaterial:false};r.view='battle';this.view='battle';this.draw(5);this.notice='讀題、選句，把想法放進草稿。';this.noticeType='info';this.changed();return true;
   }
   draw(n){const b=this.run.battle;for(let i=0;i<n&&b.hand.length<10;i++){if(!b.draw.length){if(!b.discard.length)break;b.draw=shuffled(b.discard,()=>this.random());b.discard=[];}b.hand.push(b.draw.pop());}}
   discardCards(cards){this.run.battle.discard.push(...cards.map(c=>({...c,drawApplied:false,appliedBlock:0})));}
@@ -1365,12 +1449,17 @@ class Game{
   value(card){if(card.type==='material'){const e=MATERIAL_EFFECTS[card.kind];return e?e.base+e.upgrade*card.level:0;}if(card.type==='heal')return 5+card.level*3;return card.type==='strike'?10+card.level*5:card.type==='defend'?8+card.level*4:2+card.level;}
   cost(card){return card.type==='material'&&this.run.relics.includes('highlighter')&&!this.run.battle.firstMaterial?0:1;}
   activeBattle(){return this.run?.status==='active'&&this.run.view==='battle'&&this.run.battle&&this.view==='battle'&&!this.helpOpen&&!this.run.battle.defeated;}
-  helpCost(){const b=this.run?.battle;if(!b||!['hero','tank','mage'].includes(this.run?.charId)||(b.helpPaid??false)||(b.defeated??false))return 0;return 1;}
-  helpAlert(){return(this.run?.battle?.failedSubmits??0)>=2;}
+  scaffoldEnabled(){return['hero','tank','mage'].includes(this.run?.charId);}
+  scaffoldTarget(b=this.run?.battle){return b?.type==='boss'?b.phase:b?.target;}
+  scaffoldEntry(b=this.run?.battle,target=this.scaffoldTarget(b),create=false){if(!b||!this.scaffoldEnabled()||!int(target,0,3))return null;if(!b.scaffold||typeof b.scaffold!=='object'||Array.isArray(b.scaffold)){if(!create)return null;b.scaffold={};}const key=String(target);let state=b.scaffold[key];if(!state||typeof state!=='object'||Array.isArray(state)){if(!create)return null;state=b.scaffold[key]={fails:0,watched:false,level:0};}return state;}
+  helpCost(){const b=this.run?.battle;if(!b||!this.scaffoldEnabled()||(b.defeated??false))return 0;const entry=this.scaffoldEntry(b);if(entry?.level>=2&&!entry.watched)return 0;if(b.helpPaid??false)return 0;return 1;}
+  helpAlert(){const b=this.run?.battle;if(!b)return false;if(!this.scaffoldEnabled())return(b.failedSubmits??0)>=2;return(this.scaffoldEntry(b)?.fails??0)>=2;}
+  scaffoldFailureReason(b,target=this.scaffoldTarget(b)){const topic=this.topic(),paragraph=topic?.paragraphs[target],draft=b?.draft??[];if(!paragraph)return'tooMany';if(new Set(draft.map(card=>card.bankId)).size!==draft.length)return'repeated';const misplaced=draft.findIndex(card=>card.topicId!==topic.id||!Array.isArray(card.allowed)||!card.allowed.includes(target));if(misplaced>=0)return'misplaced';if(draft.some((card,index)=>index<paragraph.pattern.length&&card.kind!==paragraph.pattern[index]))return'order';if(draft.length<paragraph.pattern.length)return'tooFew';if(draft.length>paragraph.pattern.length)return'tooMany';if(b.type==='boss'&&b.target!==b.phase)return'misplaced';return'tooMany';}
   openHelp(){const b=this.run?.battle;if(this.run?.status!=='active'||this.run?.view!=='battle'||!b||!(b.defeated||this.activeBattle()))return false;this.helpOpen=true;return true;}
   confirmHelp(){if(this.helpCost()!==1)return true;const b=this.run.battle;if(b.energy>=1){b.energy--;b.helpPaid=true;this.tell('看教學付了 1 點能量。');}else{b.helpDebt=true;b.helpPaid=true;this.tell('能量不足，下回合少 1 點能量。');}return true;}
   closeHelp(){this.helpOpen=false;return true;}
-  markHelpWatched(){const b=this.run?.battle;if(!b?.defeated)return false;b.defeatWatched=true;this.changed();return true;}
+  markScaffoldWatched(){const b=this.run?.battle;if(!b||!this.scaffoldEnabled())return false;const entry=this.scaffoldEntry(b,this.scaffoldTarget(b),true);if(!entry)return false;if(!entry.watched){entry.watched=true;this.changed();}return true;}
+  markHelpWatched(){const b=this.run?.battle;if(!b?.defeated)return false;b.defeatWatched=true;if(this.scaffoldEnabled()){const entry=this.scaffoldEntry(b,this.scaffoldTarget(b),true);if(entry)entry.watched=true;}this.changed();return true;}
   revive(){const r=this.run,b=r?.battle;if(!r||r.status!=='active'||r.view!=='battle'||!b?.defeated||!b.defeatWatched||r.reviveUsed)return false;r.hp=Math.floor(r.maxHp/2);r.reviveUsed=true;b.defeated=false;b.defeatWatched=false;this.helpOpen=false;b.round++;this.onSound?.('turn');b.energy=Math.max(0,this.energyLimit(b.round)-((b.helpDebt??false)?1:0));b.helpDebt=false;b.block=0;b.noteUsed=false;b.mulliganUsed=false;b.firstMaterial=false;if(b.hand.length<5)this.draw(5-b.hand.length);this.tell(`復活了！生命回到 ${r.hp}，草稿和手牌都保留，新回合開始。`,'good');return true;}
   giveUp(){if(!this.run?.battle?.defeated)return false;return this.finish(false);}
   play(id){if(!this.activeBattle())return false;const b=this.run.battle,i=b.hand.findIndex(c=>c.id===id);if(i<0)return false;const c=b.hand[i],cost=this.cost(c);if(cost>b.energy)return this.tell('能量不足，可以保留草稿，結束回合後繼續。','warn');if(c.type==='material'&&b.draft.length>=DRAFT_LIMIT)return this.tell('草稿已滿，請先提交或撤回一張。','warn');b.energy-=cost;b.hand.splice(i,1);
@@ -1387,23 +1476,24 @@ class Game{
   mulligan(){if(!this.activeBattle())return false;const b=this.run.battle;if(b.mulliganUsed)return this.tell('這回合已經換過思路。');const n=Math.min(2,b.hand.length);this.discardCards(b.hand.splice(0,n));b.mulliganUsed=true;this.draw(n);this.tell('已換掉最左邊的兩張牌。每回合可以換一次。');return true;}
   rate(){const b=this.run.battle;if(b.type==='boss')return .5;const hits=b.required.filter(i=>b.completed.some(p=>p.index===i)).length;return b.type==='elite'?hits===2?1:hits===1?.75:.5:hits?1:.5;}
   damage(amount){const b=this.run.battle,before=b.enemy.hp;if(b.type==='boss'){const floor=(3-b.phase)*28+1;b.enemy.hp=Math.max(floor,b.enemy.hp-amount);}else b.enemy.hp=Math.max(0,b.enemy.hp-amount);this.onCombatEffect?.('hero',Math.max(0,before-b.enemy.hp));if(b.enemy.hp<before)this.onSound?.('hit');}
+  applyScaffoldInkDiscount(){const r=this.run,b=r?.battle;if(!r||!b||!this.scaffoldEnabled())return null;const completedCount=Array.isArray(b.completed)?b.completed.length:0,base=Number.isInteger(b.inkBase)&&b.inkBase>=0?Math.min(b.inkBase,r.earnedInk):Math.max(0,r.earnedInk-1-completedCount*2),entries=b.scaffold&&typeof b.scaffold==='object'&&!Array.isArray(b.scaffold)?Object.values(b.scaffold):[],highest=Math.max(0,...entries.map(entry=>int(entry?.level,0,3)?entry.level:0)),gained=Math.max(0,r.earnedInk-base),after=base+Math.floor(gained*[1,.75,.5,.25][highest]);r.earnedInk=after;b.inkBase=after;return{level:highest,gained,kept:after-base};}
   evaluate(){const b=this.run.battle,t=this.topic(),p=t.paragraphs[b.target],cs=b.draft;if(b.completed.some(p=>p.index===b.target))return{valid:false,duplicate:true};const unique=new Set(cs.map(c=>c.bankId)).size===cs.length;return{valid:cs.length===p.pattern.length&&unique&&cs.every((c,i)=>c.topicId===t.id&&c.allowed.includes(b.target)&&c.kind===p.pattern[i]),duplicate:false};}
   submit(){if(!this.activeBattle())return false;const b=this.run.battle;if(!b.draft.length)return this.tell('先選句子加入草稿，再提交段落。');const check=this.evaluate();if(check.duplicate)return this.tell('這一段已經完成，請選另一段，不會重複結算。','warn');const valid=check.valid&&(b.type!=='boss'||b.target===b.phase);const pending=b.draft.filter(c=>c.type==='material'&&MATERIAL_EFFECTS[c.kind]?.type==='attack'&&!c.damageSpent).reduce((n,c)=>n+this.value(c),0);
     if(valid){this.onSound?.('submitOk');b.completed.push({index:b.target,text:b.draft.map(c=>c.sentence).join('')});this.run.matches++;this.run.earnedInk+=2;const rate=this.successfulSubmitRate(),dmg=this.attackDamage(pending,rate);if(b.type==='boss'){const before=b.enemy.hp;b.phase++;b.enemy.hp=(4-b.phase)*28;this.onCombatEffect?.('hero',Math.max(0,before-b.enemy.hp));if(b.enemy.hp<before)this.onSound?.('hit');}else this.damage(dmg);this.discardCards(b.draft.filter(c=>!c.ephemeral).map(c=>({...c,damageSpent:false})));b.draft=[];this.notice=b.type==='boss'?`第 ${b.phase} 段完成，文章更完整了。`:`段落已完成，造成 ${Math.round(rate*100)}% 傷害（${dmg} 點）。`;this.noticeType='good';if(b.type==='boss'&&b.phase<4)b.target=b.phase;if(b.enemy.hp<=0)this.winBattle();}
-    else{this.onSound?.('submitFail');b.failedSubmits=(b.failedSubmits??0)+1;const rate=b.type==='elite'?this.rate():.5;const dmg=this.attackDamage(pending,rate);this.damage(dmg);b.draft.forEach(c=>{if(MATERIAL_EFFECTS[c.kind]?.type==='attack')c.damageSpent=true;});this.notice=`這次組合還沒有完成新的段落，依目前破解程度造成 ${Math.round(rate*100)}% 傷害（${dmg} 點）。草稿保留，可撤回或補句後再試；已結算的牌不重複造成傷害。`;this.noticeType='warn';if(b.type!=='boss'&&b.enemy.hp<=0)this.winBattle();}
+    else{this.onSound?.('submitFail');b.failedSubmits=(b.failedSubmits??0)+1;const target=this.scaffoldTarget(b),entry=this.scaffoldEntry(b,target,true),wasWatched=!!entry?.watched,oldFails=entry?.fails??0;if(entry){entry.fails=oldFails+1;entry.level=Math.max(entry.level,wasWatched?3:entry.fails>=2?2:1);}const rate=b.type==='elite'?this.rate():.5;const dmg=this.attackDamage(pending,rate);this.damage(dmg);b.draft.forEach(c=>{if(MATERIAL_EFFECTS[c.kind]?.type==='attack')c.damageSpent=true;});const cause=entry?({repeated:'同一句放了兩次。',misplaced:`草稿第 ${Math.max(1,b.draft.findIndex(card=>card.topicId!==this.topic().id||!Array.isArray(card.allowed)||!card.allowed.includes(target))+1)} 句不是這一段的句子。`,order:'句子都對，順序要再調整。',tooFew:'方向對了，這段還少了句子。',tooMany:'句子太多了，再檢查一次。'}[this.scaffoldFailureReason(b,target)]||'句子太多了，再檢查一次。'):'';const stageTwo=!!entry&&!wasWatched&&oldFails<2&&entry.fails>=2;const original=`這次組合還沒有完成新的段落，依目前破解程度造成 ${Math.round(rate*100)}% 傷害（${dmg} 點）。草稿保留，可撤回或補句後再試；已結算的牌不重複造成傷害。`;this.notice=`${entry?`${cause}${stageTwo?' 這一段卡住了，先看教學動畫再試。':''} `:''}${original}`;this.noticeType='warn';if(b.type!=='boss'&&b.enemy.hp<=0)this.winBattle();}
     this.changed();return valid;
   }
   endTurn(){if(!this.activeBattle())return false;const b=this.run.battle,loss=Math.max(0,b.enemy.attack-b.block);this.run.hp=Math.max(0,this.run.hp-loss);this.onCombatEffect?.('monster',loss);if(loss>0)this.onSound?.('hurt');if(this.run.hp<=0){if(!this.run.reviveUsed){this.onSound?.('defeat');b.defeated=true;b.defeatWatched=false;this.tell('生命歸零。可以先看教學再挑戰一次，或結束這一局。');return true;}this.finish(false);return true;}this.discardCards(b.hand);b.hand=[];b.round++;this.onSound?.('turn');b.energy=Math.max(0,this.energyLimit(b.round)-((b.helpDebt??false)?1:0));b.helpDebt=false;b.block=0;b.noteUsed=false;b.mulliganUsed=false;b.firstMaterial=false;this.draw(5);this.tell(`新回合開始。受到 ${loss} 傷害，草稿仍然保留。`);return true;}
-  winBattle(){const r=this.run,b=r.battle;if(r.view!=='battle')return;this.onSound?.('enemyDown');r.archive.push({topic:this.topic().topic,paragraphs:clone(b.completed).sort((a,b)=>a.index-b.index)});r.hp=Math.min(r.maxHp,r.hp+4);if(b.type==='boss'){this.finish(true);return;}r.gold+=b.type==='elite'?30:20;r.reward=['material','defend','focus'];r.reward[Math.floor(this.random()*r.reward.length)]='heal';r.view='reward';this.view='reward';this.notice='戰鬥完成！選一張新牌，或保持精簡牌組。';this.noticeType='good';}
+  winBattle(){const r=this.run,b=r.battle;if(r.view!=='battle')return;this.applyScaffoldInkDiscount();this.onSound?.('enemyDown');r.archive.push({topic:this.topic().topic,paragraphs:clone(b.completed).sort((a,b)=>a.index-b.index)});r.hp=Math.min(r.maxHp,r.hp+4);if(b.type==='boss'){this.finish(true);return;}r.gold+=b.type==='elite'?30:20;r.reward=['material','defend','focus'];r.reward[Math.floor(this.random()*r.reward.length)]='heal';r.view='reward';this.view='reward';this.notice='戰鬥完成！選一張新牌，或保持精簡牌組。';this.noticeType='good';}
   reward(type){const r=this.run;if(!r||r.status!=='active'||r.view!=='reward')return false;if(type!=='skip'&&!r.reward.includes(type))return false;if(type!=='skip'&&r.deck.length<80)r.deck.push({id:`d${r.nextCard++}`,type,level:0});return this.completeNode();}
-  finish(won){const r=this.run;if(!r||r.settled)return false;if(won&&(!r.battle||r.battle.type!=='boss'||r.battle.phase!==4||r.battle.completed.length!==4))return false;r.settled=true;r.status=won?'won':'lost';r.view='result';const baseRewardInk=r.earnedInk+(won?40:5);r.rewardInk=Math.floor(baseRewardInk*(1+.1*this.metaLevel('inkLevel')));if(!this.demo){this.meta.ink+=r.rewardInk;if(won)this.meta.wins++;}this.view='result';this.notice=won?'四段文章完成，你登上了筆尖尖塔！':'這次冒險結束，帶著累積的墨水再出發。';this.noticeType=won?'good':'info';this.onSound?.(won?'triumph':'defeat');this.changed();return true;}
+  finish(won){const r=this.run;if(!r||r.settled)return false;if(won&&(!r.battle||r.battle.type!=='boss'||r.battle.phase!==4||r.battle.completed.length!==4))return false;this.applyScaffoldInkDiscount();r.settled=true;r.status=won?'won':'lost';r.view='result';const baseRewardInk=r.earnedInk+(won?40:5);r.rewardInk=Math.floor(baseRewardInk*(1+.1*this.metaLevel('inkLevel')));if(!this.demo){this.meta.ink+=r.rewardInk;if(won)this.meta.wins++;}this.view='result';this.notice=won?'四段文章完成，你登上了筆尖尖塔！':'這次冒險結束，帶著累積的墨水再出發。';this.noticeType=won?'good':'info';this.onSound?.(won?'triumph':'defeat');this.changed();return true;}
   camp(action,cardId=null){const r=this.run;if(!r||r.status!=='active'||r.view!=='camp')return false;if(action==='heal')r.hp=Math.min(r.maxHp,r.hp+Math.ceil(r.maxHp*.3));else{const c=r.deck.find(c=>c.id===cardId);if(!c)return false;if(action==='upgrade'){if(c.level>=3)return this.tell('這張卡已達升級上限。');c.level++;}else if(action==='remove'){if(r.deck.length<=10)return this.tell('牌組至少保留十張，先選擇其他行動。');r.deck.splice(r.deck.indexOf(c),1);}else return false;}this.onSound?.('camp');return this.completeNode();}
   buy(item){const r=this.run;if(!r||r.status!=='active'||r.view!=='shop')return false;const offers={material:24,defend:24,focus:30,heal:24,highlighter:45,potion:18};if(!(item in offers)||r.shopBought.includes(item)||item==='highlighter'&&r.relics.includes(item)||r.gold<offers[item])return this.tell('書籤幣不足，或這件商品已經買過了。');if(['material','defend','focus','heal'].includes(item)&&r.deck.length>=80)return this.tell('牌組已達八十張上限，未扣除書籤幣。','warn');r.gold-=offers[item];r.shopBought.push(item);if(item==='highlighter')r.relics.push(item);else if(item==='potion')r.hp=Math.min(r.maxHp,r.hp+20);else if(r.deck.length<80)r.deck.push({id:`d${r.nextCard++}`,type:item,level:0});this.onSound?.('buy');this.tell('購買完成，效果已生效。','good');return true;}
   startPractice(id){const p=PRACTICES.find(p=>p.id===id);if(!p)return false;let order=shuffled(p.parts.map((_,i)=>i),Math.random);if(order.every((x,i)=>x===i))order.push(order.shift());this.practice={id,order,selected:[],solved:false};this.view='practice';this.notice='讀讀句子，依你判斷的次序放入作品。';this.changed();return true;}
   practicePick(index){const p=this.practice;if(!p||p.solved||!p.order.includes(index)||p.selected.includes(index))return false;p.selected.push(index);this.changed();return true;}
   practiceReset(){if(!this.practice)return false;this.practice.selected=[];this.practice.solved=false;this.changed();return true;}
   practiceSubmit(){if(this.demo)return this.tell('自動示範中不能使用。');const q=this.practice;if(!q)return false;const p=PRACTICES.find(p=>p.id===q.id);if(q.selected.length!==p.parts.length||!q.selected.every((x,i)=>x===i))return this.tell('次序還可以調整。保留你的選擇，撤回一張或重新編排後再試。','warn');if(q.solved)return false;q.solved=true;const first=!this.meta.practices[q.id];if(first){this.meta.ink+=4;this.meta.practices[q.id]=true;}this.tell(first?'形式編排完成！首次完成獲得 4 墨水。':'形式編排完成！你已經領過這一題的首次獎勵。','good');return true;}
-  hints(){const b=this.run?.battle,t=this.topic(),empty={paragraphs:[],genre:'',formula:'',cards:[],cardHints:{}};if(!b||!t)return empty;const id=this.run.charId,visible=['hermit','teacher'].includes(id),required=b.type==='boss'?[b.phase]:b.required.filter(i=>!b.completed.some(p=>p.index===i)),paragraphs=b.type==='boss'?[]:required.map(i=>i+1);if(!visible)return{...empty,paragraphs};const formula=required.filter(i=>i<4).map(i=>`第${i+1}段：${t.paragraphs[i].label}｜${t.paragraphs[i].pattern.map(k=>KINDS[k]).join(' → ')}`).join('；');if(id==='hermit')return{...empty,paragraphs,genre:t.genre,formula};const wanted=t.paragraphs[b.target]?.pattern[b.draft.length],cards=b.hand.filter(c=>c.type==='material'&&c.kind===wanted&&c.allowed.includes(b.target)&&!b.draft.some(d=>d.bankId===c.bankId)).map(c=>c.id),cardHints={};for(const card of b.hand)if(cards.includes(card.id))cardHints[card.id]=`可接在第 ${b.draft.length+1} 句：${KINDS[card.kind]}`;return{paragraphs,genre:t.genre,formula,cards,cardHints};}
+  hints(){const b=this.run?.battle,t=this.topic(),empty={paragraphs:[],genre:'',formula:'',cards:[],cardHints:{},scaffoldHint:''};if(!b||!t)return empty;const id=this.run.charId,visible=['hermit','teacher'].includes(id),required=b.type==='boss'?[b.phase]:b.required.filter(i=>!b.completed.some(p=>p.index===i)),paragraphs=b.type==='boss'?[]:required.map(i=>i+1),target=this.scaffoldTarget(b),entry=this.scaffoldEntry(b,target),paragraph=t.paragraphs[target],scaffoldHint=this.scaffoldEnabled()&&entry?.level>=3&&!b.completed.some(p=>p.index===target)&&paragraph?`第 ${target+1} 段：共 ${paragraph.pattern.length} 句｜${paragraph.pattern.map(k=>KINDS[k]).join(' → ')}`:'';if(!visible)return{...empty,paragraphs,scaffoldHint};const formula=required.filter(i=>i<4).map(i=>`第${i+1}段：${t.paragraphs[i].label}｜${t.paragraphs[i].pattern.map(k=>KINDS[k]).join(' → ')}`).join('；');if(id==='hermit')return{...empty,paragraphs,genre:t.genre,formula};const wanted=t.paragraphs[b.target]?.pattern[b.draft.length],cards=b.hand.filter(c=>c.type==='material'&&c.kind===wanted&&c.allowed.includes(b.target)&&!b.draft.some(d=>d.bankId===c.bankId)).map(c=>c.id),cardHints={};for(const card of b.hand)if(cards.includes(card.id))cardHints[card.id]=`可接在第 ${b.draft.length+1} 句：${KINDS[card.kind]}`;return{paragraphs,genre:t.genre,formula,cards,cardHints,scaffoldHint:''};}
 }
 function mapReach(run){
   if(!run||!Array.isArray(run.map))return{next:[],ahead:[],passed:[],unreachable:[]};
@@ -11232,7 +11322,7 @@ if(typeof document!=='undefined'){
   function pixelMonsterEffectMarkup(monsterId){const art=MONSTER_V2_ART[monsterId];if(!art||!Array.isArray(art.fx))throw new Error('Unknown pixel monster: '+monsterId);return '<span class="battle-pixel-effect battle-pixel-monster-fx" data-monster-id="'+monsterId+'" data-reduced-frame="3">'+pixelPoseMarkup('fx',art.fx,art.palette)+'</span>';}
   const koAnimationPlayedBattles=new WeakSet();
   function renderBattle(){const r=game.run,b=r.battle,t=game.topic(),h=game.hints(),progress=game.weaknessProgress(),monsterId=monsterIdForBattle(b);const characterId=game.character().id,koDefeated=b.defeated,koFinished=koDefeated&&koAnimationPlayedBattles.has(b);if(koDefeated&&!koFinished)koAnimationPlayedBattles.add(b);
-    $('screen').innerHTML=`<section class="arena"><section class="battle-stage" id="enemy-panel" aria-label="戰場、題目與敵人"><div class="battle-title"><div class="battle-meta">第 ${(game.node(r.current)?.floor||0)+1} 層・${NAMES[b.type]}<br>回合 ${b.round}</div><div class="question" id="question">〈${esc(t.topic)}〉${h.paragraphs.length?`<br><small style="display:block;font-size:14px;color:var(--muted);font-weight:normal">弱點：${h.paragraphs.map(n=>`第 ${n} 段`).join('、')}</small>`:''}</div><div class="enemy-intent" id="enemy-intent">下次攻擊<br><b>${b.enemy.attack}</b></div></div><div class="battle-field" id="battle-field"><div class="actor hero-actor" id="hero-actor" data-pose="${b.defeated?'ko':'idle'}"${koFinished?' data-ko-played="true"':''} role="img" aria-label="${esc(game.character().name)}圖像預留">${pixelSprite(characterId)}</div><div class="actor enemy-actor" id="enemy-actor" data-monster-id="${monsterId}" data-pose="idle" role="img" aria-label="${NAMES[b.type]}圖像預留">${pixelMonsterSprite(monsterId,b.phase)}</div><div class="hero-resources" id="hero-resources" aria-label="勇者戰鬥資源"><span class="hero-energy">能量 ${b.energy}/${game.energyLimit(b.round)}</span><span class="hero-block">格擋 ${b.block}</span>${b.helpDebt?'<span class="hero-debt">下回合能量 -1</span>':''}</div><div class="battle-fx" id="battle-fx" aria-hidden="true"></div></div><div class="battle-vitals"><div id="hero-vitals">${esc(game.character().name)} ${r.hp}/${r.maxHp}<div class="enemy-hp hero-hp"><span style="width:${r.hp/r.maxHp*100}%"></span></div></div><span class="tag" id="weakness-progress">弱點 ${progress.completed}/${progress.total}</span><div id="enemy-vitals">生命 ${b.enemy.hp}/${b.enemy.maxHp}<div class="enemy-hp" role="meter" aria-label="敵人生命" aria-valuemin="0" aria-valuemax="${b.enemy.maxHp}" aria-valuenow="${b.enemy.hp}"><span style="width:${b.enemy.hp/b.enemy.maxHp*100}%"></span></div></div></div></section></section>${b.defeated?`<section id="defeat-panel" role="alertdialog" aria-labelledby="defeat-title" aria-describedby="defeat-description"><div class="defeat-card"><h2 id="defeat-title">生命歸零</h2><p id="defeat-description">每局有一次機會：看完教學後復活，生命回到一半，草稿和手牌都保留。</p><div class="defeat-actions">${button('defeat-help','看完教學再挑戰','id="defeat-help"','primary')}${button('defeat-end','結束這一局','id="defeat-end"')}</div></div></section>`:''}`;
+    $('screen').innerHTML=`<section class="arena"><section class="battle-stage${h.scaffoldHint?' has-scaffold-hint':''}" id="enemy-panel" aria-label="戰場、題目與敵人"><div class="battle-title"><div class="battle-meta">第 ${(game.node(r.current)?.floor||0)+1} 層・${NAMES[b.type]}<br>回合 ${b.round}</div><div class="question" id="question"><span class="question-title">〈${esc(t.topic)}〉</span>${h.paragraphs.length?`<small class="weakness-note">弱點：${h.paragraphs.map(n=>`第 ${n} 段`).join('、')}</small>`:''}${h.scaffoldHint?`<small class="scaffold-hint" id="scaffold-hint">${esc(h.scaffoldHint)}</small>`:''}</div><div class="enemy-intent" id="enemy-intent">下次攻擊<br><b>${b.enemy.attack}</b></div></div><div class="battle-field" id="battle-field"><div class="actor hero-actor" id="hero-actor" data-pose="${b.defeated?'ko':'idle'}"${koFinished?' data-ko-played="true"':''} role="img" aria-label="${esc(game.character().name)}圖像預留">${pixelSprite(characterId)}</div><div class="actor enemy-actor" id="enemy-actor" data-monster-id="${monsterId}" data-pose="idle" role="img" aria-label="${NAMES[b.type]}圖像預留">${pixelMonsterSprite(monsterId,b.phase)}</div><div class="hero-resources" id="hero-resources" aria-label="勇者戰鬥資源"><span class="hero-energy">能量 ${b.energy}/${game.energyLimit(b.round)}</span><span class="hero-block">格擋 ${b.block}</span>${b.helpDebt?'<span class="hero-debt">下回合能量 -1</span>':''}</div><div class="battle-fx" id="battle-fx" aria-hidden="true"></div></div><div class="battle-vitals"><div id="hero-vitals">${esc(game.character().name)} ${r.hp}/${r.maxHp}<div class="enemy-hp hero-hp"><span style="width:${r.hp/r.maxHp*100}%"></span></div></div><span class="tag" id="weakness-progress">弱點 ${progress.completed}/${progress.total}</span><div id="enemy-vitals">生命 ${b.enemy.hp}/${b.enemy.maxHp}<div class="enemy-hp" role="meter" aria-label="敵人生命" aria-valuemin="0" aria-valuemax="${b.enemy.maxHp}" aria-valuenow="${b.enemy.hp}"><span style="width:${b.enemy.hp/b.enemy.maxHp*100}%"></span></div></div></div></section></section>${b.defeated?`<section id="defeat-panel" role="alertdialog" aria-labelledby="defeat-title" aria-describedby="defeat-description"><div class="defeat-card"><h2 id="defeat-title">生命歸零</h2><p id="defeat-description">每局有一次機會：看完教學後復活，生命回到一半，草稿和手牌都保留。</p><div class="defeat-actions">${button('defeat-help','看完教學再挑戰','id="defeat-help"','primary')}${button('defeat-end','結束這一局','id="defeat-end"')}</div></div></section>`:''}`;
     $('hand-zone').innerHTML=`<section class="workspace-shell" aria-label="卡牌選句與排序"><div class="workspace-toolbar" id="workspace-toolbar"><label for="draft-target">我要寫<select id="draft-target" aria-label="選擇要寫的段落">${t.paragraphs.map((p,i)=>`<option value="${i}" ${b.target===i?'selected':''}>第 ${i+1} 段${r.charId==='teacher'?'・'+esc(p.label):''}${b.completed.some(p=>p.index===i)?'（已完成）':''}</option>`).join('')}</select></label><span class="workspace-count">已選 ${b.draft.length}/${DRAFT_LIMIT} 句</span>${button('help-open',game.helpAlert()?'卡關了嗎？看教學':'看教學','id="help-btn"',game.helpAlert()?'help-alert':'')}${h.genre?button('role-hints',`<b>文體：${esc(h.genre)}</b>${h.formula?'<span id="formula-hint" class="sr-only">'+esc(h.formula)+'</span>・'+(r.charId==='teacher'?'老師提示':'句型公式'):''}`,'id="role-hints"','hint'):''}<span class="muted">拖曳把手排序；點選句子加入或取消 · 抽牌 ${b.draw.length} · 棄牌 ${b.discard.length}</span></div><div class="hand-scroll" id="hand-scroll" aria-label="卡牌：草稿在前，手牌在後">${b.draft.length?`<div class="hand-group-label draft-group-label"><strong>草稿</strong><small>${b.draft.some(c=>c.damageSpent)?'上次提交沒組成段落：可撤回或補句後再提交':'排好順序後按『提交段落』'}</small></div>`:''}${b.draft.map((c,i)=>workspaceCard(c,'draft',i,h)).join('')}<div class="hand-group-label hand-divider"><strong>手牌</strong></div>${b.hand.map((c,i)=>workspaceCard(c,'hand',i,h)).join('')||'<p class="empty hand-empty">可用隨手筆記補句，或結束回合補充手牌。</p>'}</div></section>`;
     $('action-zone').innerHTML=`<div class="action-layout"><div class="controls-scroll" id="controls-scroll">${button('submit','提交段落','id="submit-button" '+(!b.draft.length?'disabled':''),'primary')}${button('end-turn','結束回合','id="end-turn-button"')}${button('note-dialog',b.noteUsed?'筆記已用・下回合恢復':'隨手筆記・1 能量','id="note-button" '+(b.noteUsed||b.energy<1||b.draft.length>=DRAFT_LIMIT?'disabled':''))}${button('mulligan',b.mulliganUsed?'已換思路':'換思路','id="mulligan-button" '+(b.mulliganUsed?'disabled':''))}</div><button type="button" data-action="feedback" id="feedback-button" class="footer-feedback" aria-label="完整回饋：${esc(game.notice)}"><span class="feedback-preview" id="feedback">${esc(game.notice)}</span><b class="feedback-link">完整回饋 ▸</b></button></div>`;
 
@@ -11267,7 +11357,7 @@ if(typeof document!=='undefined'){
   function showTeachingDialog(){if(!game.openHelp())return false;helpSelectedFolder=null;helpCheckId++;helpAbort?.abort();helpAbort=null;dialog.classList?.add('teaching-dialog');chipAudio.setDuck(true);showDialog(`看教學：〈${game.topic()?.topic||''}〉`,teachingDialogBody());return true;}
   function showHelpFallback(video){const player=$('help-player');if(!player)return;player.innerHTML=`<p>目前連不到教學動畫，可以複製網址，之後用瀏覽器打開。</p><code id="help-url">${esc(video.url)}</code>${button('help-copy','複製網址',`id="help-copy" data-id="${esc(video.folder)}"`)}${game.run?.battle?.defeated?button('help-seen','我看過了',`id="help-seen" data-id="${esc(video.folder)}"`):''}`;}
   function showHelpFrame(video){if(game.run?.battle?.defeated)game.markHelpWatched();renderTeachingDialog();const player=$('help-player');if(player)player.innerHTML=`<iframe id="help-frame" src="${esc(video.url)}" title="教學動畫：${esc(video.label)}" allow="fullscreen" allowfullscreen loading="lazy"></iframe>`;}
-  function beginHelpEpisode(folder){const video=game.teachingVideos().find(item=>item.folder===folder);if(!video)return;helpAbort?.abort();helpAbort=null;const request=++helpCheckId;helpSelectedFolder=folder;renderTeachingDialog();if(typeof navigator!=='undefined'&&navigator.onLine===false){showHelpFallback(video);return;}if(typeof fetch!=='function'||typeof AbortController!=='function'){showHelpFrame(video);return;}const controller=new AbortController();helpAbort=controller;const timeout=setTimeout(()=>controller.abort(),8000);fetch(video.url,{mode:'no-cors',cache:'no-store',signal:controller.signal}).then(()=>{if(request!==helpCheckId||!dialog.open)return;showHelpFrame(video);}).catch(()=>{if(request===helpCheckId&&dialog.open)showHelpFallback(video);}).finally(()=>{clearTimeout(timeout);if(helpAbort===controller)helpAbort=null;});}
+  function beginHelpEpisode(folder){const video=game.teachingVideos().find(item=>item.folder===folder);if(!video)return;helpAbort?.abort();helpAbort=null;const request=++helpCheckId;helpSelectedFolder=folder;game.markScaffoldWatched();renderTeachingDialog();if(typeof navigator!=='undefined'&&navigator.onLine===false){showHelpFallback(video);return;}if(typeof fetch!=='function'||typeof AbortController!=='function'){showHelpFrame(video);return;}const controller=new AbortController();helpAbort=controller;const timeout=setTimeout(()=>controller.abort(),8000);fetch(video.url,{mode:'no-cors',cache:'no-store',signal:controller.signal}).then(()=>{if(request!==helpCheckId||!dialog.open)return;showHelpFrame(video);}).catch(()=>{if(request===helpCheckId&&dialog.open)showHelpFallback(video);}).finally(()=>{clearTimeout(timeout);if(helpAbort===controller)helpAbort=null;});}
   async function copyHelpUrl(folder){const video=game.teachingVideos().find(item=>item.folder===folder);if(!video)return;try{if(typeof navigator==='undefined'||!navigator.clipboard?.writeText)throw new Error('clipboard');await navigator.clipboard.writeText(video.url);$('live-status').textContent='網址已複製。';}catch{const code=$('help-url'),range=document.createRange?.(),selection=window.getSelection?.();if(code&&range&&selection){range.selectNodeContents(code);selection.removeAllRanges();selection.addRange(range);}$('live-status').textContent='已選取網址，請自行複製。';}}
   function showArticle(){const b=game.run.battle;showDialog('已完成段落',`<h3>〈${esc(game.topic().topic)}〉</h3>${article(b.completed.toSorted((a,b)=>a.index-b.index))}`);}
   function showNotes(){const b=game.run.battle;showDialog('隨手筆記：選一句同題句子',`<p class="muted">每回合一次，花費 1 能量。選句後直接加入草稿。</p>${game.topic().bank.map(s=>button('note',`<small>${esc(KINDS[s.kind])}</small>${esc(s.text)}`,`data-id="${s.id}" ${b.draft.some(c=>c.bankId===s.id)?'disabled':''}`,'note-choice')).join('')}`);}

@@ -339,7 +339,7 @@ test('隨手筆記按鈕在草稿三句時停用、兩句時可用',()=>{
 });
 test('11 個題目對應指定動畫集與完整播放網址',()=>{
   const x=boot(),{game,TOPICS,TEACHING_VIDEOS,ANIMATION_BASE}=x;
-  const expected={teacher:['g3-01-person-skeleton','g3-02-person-layers'],pencil:['g3-03-object'],campus:['g4-03-scene-skeleton','g4-04-scene-layers'],trip:['g4-01-event-skeleton','g4-02-event-layers'],brave:['g6-01-person-focus-skeleton','g6-02-person-focus-layers'],special:['g6-03-event-focus-skeleton','g6-04-event-focus-layers'],desk:['g4-05-method-skeleton'],environment:['g5-01-howto-skeleton'],reading:['g5-02-why-skeleton'],humility:['g6-05-talk-skeleton'],book:['g6-06-what-skeleton','g6-07-argument-layers']};
+  const expected={teacher:['g3-01-person-skeleton','g3-02-person-layers'],pencil:['g3-03-object'],campus:['g4-03-scene-skeleton','g4-04-scene-layers'],trip:['g4-01-event-skeleton','g4-02-event-layers'],brave:['g6-01-person-focus-skeleton','g6-02-person-focus-layers'],special:['g6-03-event-focus-skeleton','g6-04-event-focus-layers'],desk:['g4-05-method-skeleton','g4-06-method-layers'],environment:['g5-01-howto-skeleton'],reading:['g5-02-why-skeleton'],humility:['g6-05-talk-skeleton'],book:['g6-06-what-skeleton','g6-07-argument-layers']};
   const expectedIds=Object.keys(expected).sort();
   assert.equal(ANIMATION_BASE,'https://bai-collab.github.io/pyes_Composition/');
   assert.deepEqual(Object.keys(TEACHING_VIDEOS).sort(),expectedIds);
@@ -1313,4 +1313,282 @@ test('頁首聲音按鈕與鍵盤可操作的設定面板標記存在',()=>{
   assert.match(html,/<dialog id="audio-settings-dialog" aria-labelledby="audio-settings-title"/);
   for(const id of ['audio-music-enabled','audio-music-volume','audio-sfx-enabled','audio-sfx-volume','audio-mute-toggle','audio-settings-close'])assert(html.includes('id="'+id+'"'),id+' missing');
   assert.match(html,/#audio-settings-dialog\{width:min\(380px,calc\(100vw - 24px\)\)/);
+});
+
+function scaffoldCards(game,index,prefix='scaffold'){
+  const topic=game.topic(),used=new Set();
+  return topic.paragraphs[index].pattern.map((kind,i)=>{const sentence=topic.bank.find(item=>item.kind===kind&&item.allowed.includes(index)&&!used.has(item.id));assert(sentence,'找到該段需要且未重複的句子');used.add(sentence.id);return cardFor(game,sentence,`${prefix}-${index}-${i}`);});
+}
+
+test('勇者失敗原因按任務順序顯示，並指出書桌第 4 段的錯句',()=>{
+  const cases=[
+    ['同一句放了兩次。',(game,b)=>{const cards=scaffoldCards(game,3);b.draft=[cards[0],{...cards[0],id:'repeated-copy'}];}],
+    ['草稿第 1 句不是這一段的句子。',(game,b)=>{b.draft=scaffoldCards(game,3);b.draft[0].topicId='other-topic';}],
+    ['草稿第 1 句不是這一段的句子。',(game,b)=>{b.draft=scaffoldCards(game,3);b.draft[0].allowed=[];}],
+    ['句子都對，順序要再調整。',(game,b)=>{b.draft=scaffoldCards(game,3).reverse();}],
+    ['方向對了，這段還少了句子。',(game,b)=>{b.draft=scaffoldCards(game,3).slice(0,1);}],
+    ['句子太多了，再檢查一次。',(game,b)=>{const cards=scaffoldCards(game,3);b.draft=[...cards,{...cards[0],id:'extra-distinct-card',bankId:'extra-distinct-bank-id'}];}]
+  ];
+  for(const[expected,prepare]of cases){const{game}=battle('monster','desk','hero'),b=game.run.battle;b.enemy.hp=10000;game.setTarget(3);prepare(game,b);assert.equal(game.submit(),false);assert.ok(game.notice.startsWith(expected),game.notice);assert(!/共\s*\d+\s*句/.test(game.notice));}
+  const{game}=battle('monster','desk','hero'),b=game.run.battle,t=game.topic();b.enemy.hp=10000;game.setTarget(3);const screenshotSentence=t.bank.find(item=>item.text==='最後，每次用完東西，馬上放回原來的位置。');assert(screenshotSentence);b.draft=[cardFor(game,screenshotSentence,'screenshot-wrong-paragraph')];assert.equal(game.submit(),false);assert.ok(game.notice.startsWith('草稿第 1 句不是這一段的句子。'));
+});
+
+test('同一段失敗兩次升到第二階、免費看教學且其他段各自計數',()=>{
+  const x=renderedBattle('monster','desk','hero'),game=x.game,b=game.run.battle,target=0;b.enemy.hp=10000;game.setTarget(target);
+  for(let i=0;i<2;i++){const card=scaffoldCards(game,target,`stage-two-${i}`)[0];card.allowed=[];b.draft=[card];assert.equal(game.submit(),false);}
+  assert.equal(b.scaffold[target].fails,2);assert.equal(b.scaffold[target].level,2);assert.equal(game.helpAlert(),true);assert(x.elements.get('hand-zone').innerHTML.includes('class="help-alert"'));assert(x.elements.get('hand-zone').innerHTML.includes('卡關了嗎？看教學'));
+  b.energy=1;assert.equal(game.helpCost(),0);assert.equal(game.confirmHelp(),true);assert.equal(b.energy,1);assert.equal(b.helpPaid,false);
+  assert.equal(game.setTarget(1),true);assert.equal(game.helpAlert(),false);assert.equal(b.scaffold[1],undefined);assert.equal(game.helpCost(),1);
+});
+
+test('看過教學後同段再失敗一次升到第三階，只顯示目前段的句數與種類順序',()=>{
+  const x=renderedBattle('monster','desk','hero'),game=x.game,b=game.run.battle,t=game.topic(),target=3;b.enemy.hp=10000;game.setTarget(target);
+  for(let i=0;i<2;i++){const card=scaffoldCards(game,target,`stage-three-before-${i}`)[0];card.allowed=[];b.draft=[card];assert.equal(game.submit(),false);}
+  assert.equal(b.scaffold[target].level,2);assert.equal(game.markScaffoldWatched(),true);assert.equal(b.scaffold[target].watched,true);
+  const card=scaffoldCards(game,target,'stage-three-after')[0];card.allowed=[];b.draft=[card];assert.equal(game.submit(),false);assert.equal(b.scaffold[target].level,3);
+  const hint=`第 4 段：共 2 句｜${t.paragraphs[target].pattern.map(kind=>x.api.KINDS[kind]).join(' → ')}`,html=x.elements.get('screen').innerHTML,attrs=renderedAttributes(html+x.elements.get('hand-zone').innerHTML),h=game.hints();
+  assert.equal(h.scaffoldHint,hint);assert(html.includes(hint));assert(html.includes('class="scaffold-hint"'));assert(!html.includes(t.genre));assert(!html.includes(t.paragraphs[target].label));assert(!attrs.some(value=>value.includes(t.genre)||value.includes(t.paragraphs[target].label)||value.includes(hint)));
+  b.scaffold[2]={fails:3,watched:true,level:3};assert.equal(game.hints().scaffoldHint,hint);
+});
+
+test('點教學集數即記錄該段已看，第二階觀看不扣能量',()=>{
+  const elements=new Map(),listeners=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{id,innerHTML:'',textContent:'',dataset:{},clientWidth:1280,open:false,addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){},scrollIntoView(){}});return elements.get(id);};
+  const document={getElementById:element,querySelectorAll:()=>[],addEventListener:(type,listener)=>listeners.set(type,listener),activeElement:null};
+  const context=vm.createContext({console,document,navigator:{onLine:false},window:{localStorage:memory()},requestAnimationFrame:()=>0,cancelAnimationFrame(){},addEventListener(){},clearTimeout(){},setTimeout:()=>0,matchMedia:()=>({matches:false}),innerWidth:1280});
+  vm.runInContext(source,context);const game=context.game;game.meta.wins=2;game.meta.hermit=true;assert(game.startRun('hero',123));game.run.current='0-0';assert(game.startBattle('monster','desk'));const b=game.run.battle,target=b.target;b.scaffold[target]={fails:2,watched:false,level:2};const energy=b.energy;game.changed();
+  const click=(action,id)=>listeners.get('click')({target:{closest:selector=>selector==='button[data-action]'?{dataset:{action,id},disabled:false}:null}});
+  click('help-open');assert.equal(game.helpCost(),0);assert.equal(b.helpPaid,false);const video=game.teachingVideos()[0];click('help-episode',video.folder);
+  assert.equal(b.scaffold[target].watched,true);assert.equal(b.energy,energy);assert.equal(b.helpPaid,false);
+});
+
+test('隱士與老師沿用原提示、整場提醒和不打折的墨水',()=>{
+  for(const char of ['hermit','teacher']){const{game}=battle('monster','desk',char),b=game.run.battle,t=game.topic(),target=b.target;b.enemy.hp=10000;const card=scaffoldCards(game,target,`unchanged-${char}`)[0];card.allowed=[];b.draft=[card];assert.equal(game.submit(),false);assert(game.notice.startsWith('這次組合還沒有完成新的段落'));assert.equal(b.scaffold[target],undefined);assert.equal(game.hints().scaffoldHint,'');assert.equal(game.hints().genre,t.genre);if(char==='hermit')assert(game.hints().formula.includes('→'));else assert(game.hints().formula.includes('→'));
+    b.failedSubmits=2;assert.equal(game.helpAlert(),true);const base=7;b.inkBase=base;game.run.earnedInk=base+3;b.scaffold={0:{fails:3,watched:true,level:3}};game.winBattle();assert.equal(game.run.earnedInk,base+3);
+  }
+});
+
+test('墨水起點包含進入戰鬥的節點點數，直接開戰不會得到負數起點',()=>{
+  const{game}=battle('monster','desk','hero');game.run.earnedInk=0;assert(game.startBattle('monster','desk'));assert.equal(game.run.battle.inkBase,0);assert(game.run.battle.inkBase>=0);
+  const next=boot().game;assert(next.startRun('hero',321));next.run.earnedInk=4;const node=next.run.map[0][0];node.type='monster';next.run.available=[node.id];assert.equal(next.enterNode(node.id),true);assert.equal(next.run.battle.inkBase,4);assert.equal(next.run.earnedInk,5);
+});
+
+test('普通怪本場墨水依最高提示階乘比例後無條件捨去',()=>{
+  for(const[level,expected]of[[0,3],[1,2],[2,1],[3,0]]){const{game}=battle('monster','desk','hero'),b=game.run.battle,target=b.target,base=7;game.run.earnedInk=base;assert(game.startBattle('monster','desk'));const battleState=game.run.battle,segment=battleState.target;battleState.inkBase=base;game.run.earnedInk=base+3;battleState.scaffold[segment]={fails:level?1:0,watched:level>=2,level};game.winBattle();assert.equal(game.run.earnedInk,base+expected);}
+});
+
+test('菁英兩段分別記錄鷹架，墨水依全場最高階遞減',()=>{
+  for(const[level,expected]of[[0,5],[1,3],[2,2],[3,1]]){const{game}=battle('elite','desk','hero'),b=game.run.battle,base=9;game.run.earnedInk=base;assert(game.startBattle('elite','desk'));const current=game.run.battle,[first,second]=current.required;current.inkBase=base;game.run.earnedInk=base+5;current.scaffold[first]={fails:level,watched:level>=2,level};current.scaffold[second]={fails:0,watched:false,level:0};game.winBattle();assert.equal(game.run.earnedInk,base+expected);}
+});
+
+test('頭目各階有獨立鷹架，九點墨水按最高階變為九、六、四、二',()=>{
+  for(const[level,expected]of[[0,9],[1,6],[2,4],[3,2]]){const{game}=battle('boss','desk','hero'),b=game.run.battle,base=12;game.run.earnedInk=base;assert(game.startBattle('boss','desk'));const current=game.run.battle;current.inkBase=base;game.run.earnedInk=base+9;current.phase=4;current.completed=[0,1,2,3].map(index=>({index,text:`第${index+1}段`}));current.scaffold={0:{fails:0,watched:false,level:0},1:{fails:0,watched:false,level:0},2:{fails:0,watched:false,level:0},3:{fails:level,watched:level>=2,level}};game.winBattle();assert.equal(game.run.earnedInk,base+expected);assert.equal(game.run.status,'won');}
+});
+
+test('戰敗結束同樣打折，示範局不把墨水寫入局外資料',()=>{
+  const{game}=battle('monster','desk','hero'),b=game.run.battle,base=5;game.run.earnedInk=base;assert(game.startBattle('monster','desk'));const current=game.run.battle,target=current.target;current.inkBase=base;game.run.earnedInk=base+3;current.scaffold[target]={fails:2,watched:false,level:2};current.defeated=true;assert.equal(game.giveUp(),true);assert.equal(game.run.earnedInk,base+1);assert.equal(game.run.status,'lost');
+  const demo=boot().game;demo.meta.ink=777;assert(demo.startDemo('hero',111));assert(demo.startBattle('monster','desk'));const demoBattle=demo.run.battle;demo.run.earnedInk=3;demoBattle.scaffold[demoBattle.target]={fails:1,watched:false,level:3};demo.winBattle();assert.equal(demo.meta.ink,777);
+});
+
+test('舊進行中存檔可讀，鷹架合法值可往返，壞值不覆寫原存檔',()=>{
+  const x=battle('monster','desk','hero'),game=x.game,legacy={version:2,meta:normal(game.meta),run:normal(game.run),selected:game.selected};delete legacy.run.battle.inkBase;delete legacy.run.battle.scaffold;const legacyRaw=JSON.stringify(legacy),old=new x.Game(memory(legacyRaw));assert(old.storageOK);
+  game.run.earnedInk=5;game.run.battle.inkBase=4;game.run.battle.scaffold={0:{fails:0,watched:false,level:0},3:{fails:4,watched:true,level:3}};assert.equal(game.save(),true);const saved=JSON.parse(x.storage.getItem(x.SAVE_KEY));assert.equal(saved.version,2);const restored=new x.Game(memory(JSON.stringify(saved)));assert(restored.storageOK);assert.deepEqual(normal(restored.run.battle.scaffold),normal(game.run.battle.scaffold));assert.equal(restored.run.battle.inkBase,4);
+  const invalid=[run=>{run.battle.scaffold=[];},run=>{run.battle.scaffold={'4':{fails:0,watched:false,level:0}};},run=>{run.battle.scaffold={'0':{fails:-1,watched:false,level:0}};},run=>{run.battle.scaffold={'0':{fails:1.5,watched:false,level:0}};},run=>{run.battle.scaffold={'0':{fails:0,watched:'yes',level:0}};},run=>{run.battle.scaffold={'0':{fails:0,watched:false,level:4}};},run=>{run.battle.inkBase=-1;},run=>{run.battle.inkBase=1.5;}];
+  for(const mutate of invalid){const badRun=normal(game.run);mutate(badRun);const raw=JSON.stringify({version:2,meta:normal(game.meta),run:badRun,selected:game.selected}),storage=memory(raw),loaded=new x.Game(storage);assert.equal(loaded.storageOK,false);assert.equal(storage.getItem(x.SAVE_KEY),raw);}
+});
+
+function pencilParagraphCards(game,index,prefix='pencil'){
+  const topic=game.topic();
+  return topic.paragraphs[index].units.map((unit,i)=>{
+    const sourceCard=topic.bank.find(item=>item.text===unit[1]);
+    assert(sourceCard,'客廳句子存在於素材庫');
+    return cardFor(game,sourceCard,`${prefix}-${index}-${i}`);
+  });
+}
+
+test('pencil 題目使用核准的客廳四段、十二句與句型',()=>{
+  const topic=boot().TOPICS.find(item=>item.id==='pencil');
+  const expected=[
+    {label:'客廳的整體',units:[['a','我家的客廳在一進門的地方，是全家人最常待的空間。'],['a','客廳裡的家具不多，擺得整整齊齊。'],['b','一走進客廳，我就覺得好輕鬆。']]},
+    {label:'前面和左邊',units:[['a','客廳前面是一臺電視，下面的矮櫃放著遙控器和相簿。'],['a','左邊有一扇大窗戶，窗臺上擺著兩盆綠色的小盆栽。'],['b','午後坐在窗邊曬太陽，心裡暖洋洋的。']]},
+    {label:'後面和右邊',units:[['a','客廳後面是一張長長的沙發，上面放著三個軟軟的抱枕。'],['a','右邊靠牆是一個書櫃，裝滿了爸爸和我的書。'],['b','窩在沙發上看書，是我最喜歡的時光。']]},
+    {label:'我對客廳的感覺',units:[['a','每天晚上，我們一家人都會在客廳聊天。'],['b','我好喜歡這個溫暖又舒服的客廳。'],['b','希望我們一家人能一直在這裡快樂地生活。']]}
+  ];
+  assert.equal(topic.topic,'我家的客廳');assert.equal(topic.genre,'記敘文（狀物）');
+  assert.deepEqual(normal(topic.paragraphs.map(({label,units})=>({label,units}))),expected);
+  assert.deepEqual(normal(topic.paragraphs.map(paragraph=>paragraph.pattern)),[['a','a','b'],['a','a','b'],['a','a','b'],['a','b','b']]);
+});
+
+test('客廳四段可正確提交，第三段誤放第二段句子會指出第 1 句',()=>{
+  const {game}=battle('monster','pencil','hero'),b=game.run.battle;
+  for(let index=0;index<4;index++){b.target=index;b.draft=pencilParagraphCards(game,index,`pencil-valid-${index}`);assert.equal(game.evaluate().valid,true,`第 ${index+1} 段可完成`);}
+  b.target=2;b.enemy.hp=10000;b.draft=pencilParagraphCards(game,1,'pencil-wrong-segment');
+  assert.equal(game.evaluate().valid,false);assert.equal(game.submit(),false);assert.ok(game.notice.startsWith('草稿第 1 句不是這一段的句子。'),game.notice);
+});
+
+test('舊文具盒存檔只在讀入記憶體時遷移，四個牌堆可繼續提交並正常保存',()=>{
+  const x=battle('monster','pencil','hero'),game=x.game,topic=game.topic(),run=normal(game.run),b=run.battle;
+  const oldSentences=['我的文具盒是深藍色的，盒蓋上有一顆白色星星。','盒子的四個角圓圓的，握在手裡很平滑。','這個簡單的樣子，讓我越看越喜歡。','打開盒蓋，左邊躺著鉛筆，右邊放著橡皮擦。','中間的小隔板把尺和筆分開，找東西很方便。','看到盒子裡整整齊齊的，我的心也安定下來。','上美術課時，我從文具盒拿出彩色鉛筆。','畫完後，我把筆一枝枝放回原來的位置。','文具盒陪我完成作品，像個安靜的小幫手。','這個文具盒已經陪我度過好幾個學期。','我很珍惜它帶給我的方便與回憶。','我希望好好照顧它，讓它繼續陪我學習。'];
+  const oldByBankId=new Map(topic.bank.map((item,index)=>[item.id,oldSentences[index]]));
+  const legacyCard=(unit,pile,index)=>({id:`legacy-${pile}-${index}`,type:'material',topicId:'pencil',bankId:unit.id,kind:unit.kind,sentence:oldByBankId.get(unit.id),allowed:unit.allowed,level:0,damageSpent:false,...(pile==='draft'?{paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}:{})});
+  b.target=0;
+  b.hand=[legacyCard(topic.bank[0],'hand',0)];b.draw=[legacyCard(topic.bank[1],'draw',1)];b.discard=[legacyCard(topic.bank[2],'discard',2)];
+  b.draft=topic.paragraphs[0].units.map((_,index)=>legacyCard(topic.bank[index],'draft',index));
+  const originalFields=Object.fromEntries(['hand','draw','discard','draft'].map(pile=>[pile,b[pile].map(({sentence,...card})=>card)]));
+  const legacyRaw=JSON.stringify({version:2,meta:normal(game.meta),run,selected:game.selected}),storage=memory(legacyRaw),loaded=new x.Game(storage);
+  assert.equal(loaded.storageOK,true,loaded.notice);assert(!loaded.notice.includes('原存檔無法讀取'));assert.equal(storage.getItem(x.SAVE_KEY),legacyRaw);
+  const migrated=loaded.run.battle,expected=['hand','draw','discard','draft'].map(pile=>migrated[pile].map(card=>card.sentence));
+  assert.deepEqual(normal(expected),[
+    ['我家的客廳在一進門的地方，是全家人最常待的空間。'],
+    ['客廳裡的家具不多，擺得整整齊齊。'],
+    ['一走進客廳，我就覺得好輕鬆。'],
+    ['我家的客廳在一進門的地方，是全家人最常待的空間。','客廳裡的家具不多，擺得整整齊齊。','一走進客廳，我就覺得好輕鬆。']
+  ]);
+  for(const pile of ['hand','draw','discard','draft'])assert.deepEqual(normal(migrated[pile].map(({sentence,...card})=>card)),normal(originalFields[pile]));
+  assert.equal(loaded.resume(),true);assert.equal(loaded.evaluate().valid,true);assert.equal(loaded.submit(),true);assert.equal(loaded.save(),true);
+  const saved=JSON.parse(storage.getItem(x.SAVE_KEY));assert.equal(saved.run.battle.completed[0].text,topic.paragraphs[0].units.map(unit=>unit[1]).join(''));
+  for(const pile of ['hand','draw','discard','draft'])for(const card of saved.run.battle[pile])if(card.topicId==='pencil'&&card.type==='material')assert.equal(card.sentence,topic.bank.find(item=>item.id===card.bankId).text);
+  for(const old of oldSentences)assert(!storage.getItem(x.SAVE_KEY).includes(old));
+});
+
+test('舊存檔中其他不存在的句子仍拒絕讀取且不覆寫',()=>{
+  const x=battle('monster','pencil','hero'),run=normal(x.game.run),card=[...run.battle.hand,...run.battle.draw,...run.battle.discard].find(item=>item.type==='material');
+  assert(card);card.sentence='其他不存在的句子';const raw=JSON.stringify({version:2,meta:normal(x.game.meta),run,selected:x.game.selected}),storage=memory(raw),loaded=new x.Game(storage);
+  assert.equal(loaded.storageOK,false);assert(loaded.notice.includes('原存檔無法讀取'));assert.equal(storage.getItem(x.SAVE_KEY),raw);
+});
+
+test('四個題目的段名、句子、種類順序與書桌教學集符合核准內容',()=>{
+  const {TOPICS,TEACHING_VIDEOS}=boot();
+  const expected=[{"id":"desk","topic":"書桌的整理方式","genre":"說明文（事理）","paragraphs":[{"label":"提出問題","units":[["claim","書桌整理得有條理，才能留下足夠的工作空間。"],["reason","物品若散在桌上，找書和寫字都容易受影響。"]]},{"label":"分析原因","units":[["reason","把不常用的東西留在桌面，是雜亂的原因之一。"],["example","例如舊講義和空盒堆在桌角，會擋住常用的課本。"]]},{"label":"整理作法","units":[["step","首先，把桌面物品全部拿下來，依用途分類。"],["step","其次，把常用文具放進筆筒，其他物品收進抽屜。"],["step","最後，每次用完東西，馬上放回原來的位置。"]]},{"label":"結論","units":[["effect","東西各有位置，要用的書和筆一下子就找到。"],["claim","整理書桌的重點，是分類並讓物品各有位置。"]]}]},{"id":"environment","topic":"如何保護環境","genre":"議論文（如何型）","paragraphs":[{"label":"主張與理由","units":[["claim","保護環境應該從每天的小事做起。"],["reason","因為我們使用資源的方式，會影響共同生活的地方。"]]},{"label":"方法一和二","units":[["step","首先，離開房間時隨手關燈，珍惜能源。"],["step","其次，做好垃圾分類，讓可回收的物品再次被利用。"],["effect","節約能源與資源，能減輕環境的負擔。"]]},{"label":"方法三","units":[["step","最後，外出時帶自己的水壺，減少一次性容器。"],["effect","少用一個拋棄式杯子，就能少製造一份垃圾。"]]},{"label":"再說一次主張","units":[["claim","保護環境需要每個人持續參與。"],["claim","只要每天做好這些小事，我們的環境就會越來越好。"]]}]},{"id":"reading","topic":"讀書的重要","genre":"議論文（為何型）","paragraphs":[{"label":"提出論點","units":[["claim","讀書，就是從書中認識別人的經驗與想法。"],["claim","我認為，讀書能幫助我們認識更寬廣的世界。"]]},{"label":"論證一","units":[["reason","讀書可以補充生活中還沒有接觸過的知識。"],["example","我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。"]]},{"label":"論證二","units":[["reason","讀書也能幫助我們理解別人的處境。"],["example","同學讀了關於搬家的故事後，主動陪伴剛轉學的新同學，讓他不再孤單。"]]},{"label":"重申論點","units":[["claim","讀書的重要，在於讓眼界與心胸一起成長。"],["step","我們可以每天留一點時間，選一本適合自己的書。"]]}]},{"id":"humility","topic":"談謙虛","genre":"議論文（談論型）","paragraphs":[{"label":"提出論點","units":[["claim","謙虛能讓人看見自己的不足，願意繼續學習。"],["reason","如果總覺得自己最好，就容易忽略別人的提醒。"]]},{"label":"論據","units":[["example","小安雖然跑得快，仍向隊友請教交棒，練習後全隊的接力更順利。"],["quote","《尚書》說：「滿招損，謙受益。」"],["summary","願意學習別人的長處，正能幫助自己進步。"]]},{"label":"方法","units":[["step","遇到不同意見時，先聽完對方的理由。"],["step","發現自己做錯時，承認不足並重新練習。"]]},{"label":"重申","units":[["claim","謙虛不是否定自己，而是保持願意學習的心。"],["claim","只要保持謙虛，就能一天比一天進步。"]]}]}];
+  for(const item of expected){
+    const topic=TOPICS.find(value=>value.id===item.id);
+    assert(topic,'topic exists: '+item.id);
+    assert.equal(topic.topic,item.topic);
+    assert.equal(topic.genre,item.genre);
+    assert.deepEqual(normal(topic.paragraphs.map(({label,units})=>({label,units}))),item.paragraphs,item.id+' exact paragraph content');
+    assert.deepEqual(normal(topic.paragraphs.map(paragraph=>paragraph.pattern)),item.paragraphs.map(paragraph=>paragraph.units.map(([kind])=>kind)),item.id+' patterns');
+  }
+  assert.deepEqual(normal(TEACHING_VIDEOS.desk),['g4-05-method-skeleton','g4-06-method-layers']);
+});
+
+test('其餘七題的題目資料與改版前備份完全一致',async()=>{
+  const {createHash}=await import('node:crypto');
+  const unchanged=normal(boot().TOPICS).filter(topic=>!['desk','environment','reading','humility'].includes(topic.id)).map(({id,topic,genre,paragraphs})=>({id,topic,genre,paragraphs:paragraphs.map(({label,units})=>({label,units}))}));
+  assert.equal(createHash('sha256').update(JSON.stringify(unchanged)).digest('hex'),'b2c36e035890ee1b13c80e1c622a68a4fbbfc3db72c9b8ca80f2e7a63a01afd7');
+});
+
+test('四題新句照順序成立，指定的舊順序與舊組合不成立',()=>{
+  const specs=[
+    {id:'desk',wrongTarget:3,wrongTexts:['整理書桌的重點，是分類並讓物品各有位置。','東西各有位置，要用的書和筆一下子就找到。']},
+    {id:'environment',wrongTarget:1,wrongTexts:['最後，外出時帶自己的水壺，減少一次性容器。','少用一個拋棄式杯子，就能少製造一份垃圾。']},
+    {id:'reading',wrongTarget:1,wrongTexts:['讀書可以補充生活中還沒有接觸過的知識。','我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。'],extraLegacySummary:true},
+    {id:'humility',wrongTarget:1,wrongTexts:['《尚書》說：「滿招損，謙受益。」','小安雖然跑得快，仍向隊友請教交棒，練習後全隊的接力更順利。','願意學習別人的長處，正能幫助自己進步。']}
+  ];
+  for(const item of specs){
+    const {game}=battle('monster',item.id),topic=game.topic(),battleState=game.run.battle;
+    for(let index=0;index<topic.paragraphs.length;index++){
+      battleState.target=index;
+      battleState.draft=topic.paragraphs[index].units.map(([kind,text],unitIndex)=>{
+        const source=topic.bank.find(card=>card.text===text&&card.kind===kind);
+        assert(source,item.id+' sentence exists in bank');
+        return cardFor(game,source,item.id+'-valid-'+index+'-'+unitIndex);
+      });
+      assert.equal(game.evaluate().valid,true,item.id+' paragraph '+(index+1));
+    }
+    battleState.target=item.wrongTarget;
+    battleState.draft=item.wrongTexts.map((text,index)=>{
+      const source=topic.bank.find(card=>card.text===text);
+      assert(source,item.id+' wrong-order sentence exists');
+      return cardFor(game,source,item.id+'-wrong-order-'+index);
+    });
+    if(item.extraLegacySummary)battleState.draft.push({id:'reading-old-summary',type:'material',topicId:'reading',bankId:'reading-old-summary',kind:'summary',sentence:'可見閱讀能讓我們看見更多原本忽略的事物。',allowed:[1],level:0,damageSpent:false});
+    assert.equal(game.evaluate().valid,false,item.id+' old order or grouping');
+  }
+});
+
+test('四題舊戰鬥存檔各牌堆按舊句映射；記憶體遷移可繼續提交與保存，壞句不覆寫',()=>{
+  const legacySnapshots=[{"id":"desk","paragraphs":[[["claim","書桌整理得有條理，才能留下足夠的工作空間。"],["reason","物品若散在桌上，找書和寫字都容易受影響。"]],[["reason","把不常用的東西留在桌面，是雜亂的原因之一。"],["example","例如舊講義和空盒堆在桌角，會擋住常用的課本。"]],[["step","首先，把桌面物品全部拿下來，依用途分類。"],["step","其次，把常用文具放進筆筒，其他物品收進抽屜。"],["effect","分類後再放回去，就能留下清楚的讀寫區。"]],[["claim","整理書桌的重點，是分類並讓物品各有位置。"],["effect","每次使用後放回原處，便能維持方便的工作空間。"]]]},{"id":"environment","paragraphs":[[["claim","保護環境應該從每天的小事做起。"],["reason","因為我們使用資源的方式，會影響共同生活的地方。"]],[["step","首先，外出時帶自己的水壺，減少一次性容器。"],["effect","少用一個拋棄式杯子，就能少製造一份垃圾。"]],[["step","其次，離開房間時隨手關燈，珍惜能源。"],["step","也可以做好分類，讓可回收的物品再次被利用。"],["effect","節約能源與資源，能減輕環境的負擔。"]],[["claim","保護環境需要每個人持續參與。"],["step","讓我們從自備水壺、隨手關燈與分類開始。"]]]},{"id":"reading","paragraphs":[[["claim","讀書能幫助我們認識更寬廣的世界。"],["reason","書中記錄了許多人經歷的事情與思考。"]],[["reason","讀書可以補充生活中還沒有接觸過的知識。"],["example","我讀了植物圖鑑後，認出校園裡不同的葉子，觀察也更仔細。"],["summary","可見閱讀能讓我們看見更多原本忽略的事物。"]],[["reason","讀書也能幫助我們理解別人的處境。"],["example","同學讀了關於搬家的故事後，主動陪伴剛轉學的新同學，讓他不再孤單。"],["summary","因此，閱讀不只增加知識，也能帶來體諒。"]],[["claim","讀書的重要，在於讓眼界與心胸一起成長。"],["step","我們可以每天留一點時間，選一本適合自己的書。"]]]},{"id":"humility","paragraphs":[[["claim","謙虛能讓人看見自己的不足，願意繼續學習。"],["reason","如果總覺得自己最好，就容易忽略別人的提醒。"]],[["quote","《尚書》說：「滿招損，謙受益。」"],["example","小安雖然跑得快，仍向隊友請教交棒，練習後全隊的接力更順利。"],["summary","願意學習別人的長處，正能幫助自己進步。"]],[["step","遇到不同意見時，先聽完對方的理由。"],["step","發現自己做錯時，承認不足並重新練習。"],["effect","這樣就能把別人的提醒，變成成長的機會。"]],[["claim","謙虛不是否定自己，而是保持願意學習的心。"],["step","讓我們珍惜自己的長處，也尊重別人的本領。"]]]}];
+  const legacyById=Object.fromEntries(legacySnapshots.map(topic=>[topic.id,topic.paragraphs]));
+  const textOverrides={
+    environment:{
+      '其次，離開房間時隨手關燈，珍惜能源。':'首先，離開房間時隨手關燈，珍惜能源。',
+      '也可以做好分類，讓可回收的物品再次被利用。':'其次，做好垃圾分類，讓可回收的物品再次被利用。',
+      '首先，外出時帶自己的水壺，減少一次性容器。':'最後，外出時帶自己的水壺，減少一次性容器。'
+    },
+    reading:{'讀書能幫助我們認識更寬廣的世界。':'我認為，讀書能幫助我們認識更寬廣的世界。'}
+  };
+  const removedByTopic={desk:'分類後再放回去，就能留下清楚的讀寫區。',environment:'讓我們從自備水壺、隨手關燈與分類開始。',reading:'書中記錄了許多人經歷的事情與思考。',humility:'這樣就能把別人的提醒，變成成長的機會。'};
+  for(const [topicId,oldParagraphs] of Object.entries(legacyById)){
+    const {game,validRun,Game,SAVE_KEY}=battle('monster',topicId),topic=game.topic(),run=normal(game.run),battleState=run.battle;
+    const expectedBySentence=new Map(),oldSentences=[];
+    oldParagraphs.forEach((paragraph,paragraphIndex)=>paragraph.forEach(([,sentence])=>{
+      oldSentences.push(sentence);
+      const wanted=textOverrides[topicId]?.[sentence]||sentence;
+      let destination=topic.bank.find(card=>card.text===wanted);
+      if(!destination){
+        const lastSentence=topic.paragraphs[paragraphIndex].units.at(-1)[1];
+        destination=topic.bank.find(card=>card.text===lastSentence);
+      }
+      assert(destination,topicId+' has a mapped destination for '+sentence);
+      expectedBySentence.set(sentence,destination);
+    }));
+    const legacyCards=oldParagraphs.flatMap((paragraph,paragraphIndex)=>paragraph.map(([kind,sentence],unitIndex)=>({id:topicId+'-legacy-'+paragraphIndex+'-'+unitIndex,type:'material',topicId,bankId:topicId+'-'+paragraphIndex+'-'+unitIndex,kind,sentence,allowed:[paragraphIndex],level:0,damageSpent:false})));
+    const removedCard=legacyCards.find(card=>card.sentence===removedByTopic[topicId]);
+    assert(removedCard,topicId+' removed sentence is present in old save');
+    const removedParagraph=oldParagraphs.findIndex(paragraph=>paragraph.some(([,sentence])=>sentence===removedByTopic[topicId]));
+    Object.assign(removedCard,{paidCost:1,playedRound:battleState.round,appliedBlock:0,drawApplied:false});
+    const otherCards=legacyCards.filter(card=>card!==removedCard);
+    battleState.hand=otherCards.slice(0,3);
+    battleState.draw=otherCards.slice(3,6);
+    battleState.discard=otherCards.slice(6);
+    battleState.draft=[removedCard];
+    battleState.target=removedParagraph;
+    run.archive=[{topic:topic.topic,paragraphs:[{index:0,text:'既有文章紀錄'}]}];
+    const originalOtherFields=new Map(legacyCards.map(card=>[card.id,normal(Object.fromEntries(Object.entries(card).filter(([key])=>!['bankId','kind','sentence','allowed'].includes(key))))]));
+    const legacyRaw=JSON.stringify({version:2,meta:normal(game.meta),run,selected:game.selected}),storage=memory(legacyRaw),loaded=new Game(storage);
+    assert.equal(loaded.storageOK,true,topicId+': '+loaded.notice);
+    assert.equal(storage.getItem(SAVE_KEY),legacyRaw,topicId+' migration stays in memory before save');
+    assert.equal(validRun(loaded.run),true,topicId+' migrated run validates');
+    assert.deepEqual(normal(loaded.run.archive),run.archive,topicId+' article archive is unchanged');
+    const loadedBattle=loaded.run.battle,pileCards=['hand','draw','discard','draft'].flatMap(pile=>loadedBattle[pile]);
+    assert.equal(pileCards.length,legacyCards.length,topicId+' all old cards remain');
+    for(const card of pileCards){
+      const oldCard=legacyCards.find(old=>old.id===card.id),destination=expectedBySentence.get(oldCard.sentence);
+      assert(destination,topicId+' expected mapping exists for '+card.id);
+      assert.deepEqual(normal({bankId:card.bankId,kind:card.kind,sentence:card.sentence,allowed:card.allowed}),normal({bankId:destination.id,kind:destination.kind,sentence:destination.text,allowed:destination.allowed}),topicId+' converted '+card.id);
+      const other=normal(Object.fromEntries(Object.entries(card).filter(([key])=>!['bankId','kind','sentence','allowed'].includes(key))));
+      assert.deepEqual(other,originalOtherFields.get(card.id),topicId+' retained other fields for '+card.id);
+    }
+    assert.equal(loaded.resume(),true,topicId+' resumes and writes migrated memory');
+    assert.notEqual(storage.getItem(SAVE_KEY),legacyRaw,topicId+' normal save persists migration');
+    const currentTopic=loaded.topic();
+    assert.equal(loaded.setTarget(0),true);
+    const continuingBattle=loaded.run.battle;
+    continuingBattle.energy=3;
+    continuingBattle.enemy.hp=1000;
+    continuingBattle.enemy.maxHp=1000;
+    continuingBattle.draft=currentTopic.paragraphs[0].units.map(([kind,text],index)=>{
+      const source=currentTopic.bank.find(card=>card.kind===kind&&card.text===text);
+      assert(source);
+      return {...cardFor(loaded,source,topicId+'-continue-'+index),paidCost:1,playedRound:continuingBattle.round,appliedBlock:0,drawApplied:false};
+    });
+    assert.equal(loaded.evaluate().valid,true,topicId+' can continue with a current paragraph');
+    assert.equal(loaded.submit(),true,topicId+' current paragraph submits');
+    assert.equal(loaded.save(),true,topicId+' saves after continuing');
+    const saved=JSON.parse(storage.getItem(SAVE_KEY)),savedBattle=saved.run.battle;
+    assert.equal(validRun(saved.run),true,topicId+' saved run validates');
+    const stale=oldSentences.filter(sentence=>!currentTopic.bank.some(card=>card.text===sentence));
+    for(const sentence of stale)assert(!['hand','draw','discard','draft'].some(pile=>savedBattle[pile].some(card=>card.type==='material'&&card.sentence===sentence)),topicId+' no stale legacy sentence is saved');
+    for(const pile of ['hand','draw','discard','draft'])for(const card of savedBattle[pile])if(card.type==='material'){
+      const currentCard=currentTopic.bank.find(bankCard=>bankCard.id===card.bankId);
+      assert(currentCard);
+      assert.equal(card.sentence,currentCard.text,topicId+' saved sentence matches bank');
+      assert.equal(card.kind,currentCard.kind,topicId+' saved kind matches bank');
+      assert.deepEqual(normal(card.allowed),normal(currentCard.allowed),topicId+' saved paragraph matches bank');
+    }
+    const badRun=normal(run),badCard=badRun.battle.hand[0];
+    badCard.sentence='不存在的舊句子';
+    const badRaw=JSON.stringify({version:2,meta:normal(game.meta),run:badRun,selected:game.selected}),badStorage=memory(badRaw),rejected=new Game(badStorage);
+    assert.equal(rejected.storageOK,false,topicId+' unknown sentence rejects');
+    assert.equal(badStorage.getItem(SAVE_KEY),badRaw,topicId+' rejected save is unchanged');
+  }
 });
