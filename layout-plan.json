@@ -1,0 +1,1973 @@
+{
+  "version": 3,
+  "status": "verified",
+  "viewport_profiles": [
+    {
+      "id": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "normalized": true,
+      "variant": "desktop",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "1366x768",
+      "width": 1366,
+      "height": 768,
+      "normalized": true,
+      "variant": "desktop",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "1366x600",
+      "width": 1366,
+      "height": 600,
+      "normalized": true,
+      "variant": "desktop",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "1024x600",
+      "width": 1024,
+      "height": 600,
+      "normalized": true,
+      "variant": "desktop",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "768x1024",
+      "width": 768,
+      "height": 1024,
+      "normalized": true,
+      "variant": "narrow",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "390x844",
+      "width": 390,
+      "height": 844,
+      "normalized": true,
+      "variant": "narrow",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "1366x625",
+      "width": 1366,
+      "height": 625,
+      "normalized": true,
+      "variant": "desktop",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    }
+  ],
+  "layout_blocks": [
+    {
+      "id": "hud",
+      "viewport": "1920x1080",
+      "parent_id": "viewport",
+      "role": "hud",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "screen",
+      "viewport": "1920x1080",
+      "parent_id": "viewport",
+      "role": "battlefield",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.08,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "clip-fx-only"
+    },
+    {
+      "id": "hand-zone",
+      "viewport": "1920x1080",
+      "parent_id": "viewport",
+      "role": "card-workspace",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.5,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-auto-scroll"
+    },
+    {
+      "id": "action-zone",
+      "viewport": "1920x1080",
+      "parent_id": "viewport",
+      "role": "action-zone",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.9199999999999999,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "hud",
+      "viewport": "1366x768",
+      "parent_id": "viewport",
+      "role": "hud",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "screen",
+      "viewport": "1366x768",
+      "parent_id": "viewport",
+      "role": "battlefield",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.08,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "clip-fx-only"
+    },
+    {
+      "id": "hand-zone",
+      "viewport": "1366x768",
+      "parent_id": "viewport",
+      "role": "card-workspace",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.5,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-auto-scroll"
+    },
+    {
+      "id": "action-zone",
+      "viewport": "1366x768",
+      "parent_id": "viewport",
+      "role": "action-zone",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.9199999999999999,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "hud",
+      "viewport": "1366x600",
+      "parent_id": "viewport",
+      "role": "hud",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "screen",
+      "viewport": "1366x600",
+      "parent_id": "viewport",
+      "role": "battlefield",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.08,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "clip-fx-only"
+    },
+    {
+      "id": "hand-zone",
+      "viewport": "1366x600",
+      "parent_id": "viewport",
+      "role": "card-workspace",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.5,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-auto-scroll"
+    },
+    {
+      "id": "action-zone",
+      "viewport": "1366x600",
+      "parent_id": "viewport",
+      "role": "action-zone",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.9199999999999999,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "hud",
+      "viewport": "1024x600",
+      "parent_id": "viewport",
+      "role": "hud",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "screen",
+      "viewport": "1024x600",
+      "parent_id": "viewport",
+      "role": "battlefield",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.08,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "clip-fx-only"
+    },
+    {
+      "id": "hand-zone",
+      "viewport": "1024x600",
+      "parent_id": "viewport",
+      "role": "card-workspace",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.5,
+        "width": 1,
+        "height": 0.42
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-auto-scroll"
+    },
+    {
+      "id": "action-zone",
+      "viewport": "1024x600",
+      "parent_id": "viewport",
+      "role": "action-zone",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.9199999999999999,
+        "width": 1,
+        "height": 0.08
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "hud",
+      "viewport": "768x1024",
+      "parent_id": "viewport",
+      "role": "hud",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.1
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "screen",
+      "viewport": "768x1024",
+      "parent_id": "viewport",
+      "role": "battlefield",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.1,
+        "width": 1,
+        "height": 0.36
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "clip-fx-only"
+    },
+    {
+      "id": "hand-zone",
+      "viewport": "768x1024",
+      "parent_id": "viewport",
+      "role": "card-workspace",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.45999999999999996,
+        "width": 1,
+        "height": 0.44
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-auto-scroll"
+    },
+    {
+      "id": "action-zone",
+      "viewport": "768x1024",
+      "parent_id": "viewport",
+      "role": "action-zone",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.8999999999999999,
+        "width": 1,
+        "height": 0.1
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "hud",
+      "viewport": "390x844",
+      "parent_id": "viewport",
+      "role": "hud",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.1
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "screen",
+      "viewport": "390x844",
+      "parent_id": "viewport",
+      "role": "battlefield",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.1,
+        "width": 1,
+        "height": 0.36
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "clip-fx-only"
+    },
+    {
+      "id": "hand-zone",
+      "viewport": "390x844",
+      "parent_id": "viewport",
+      "role": "card-workspace",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.45999999999999996,
+        "width": 1,
+        "height": 0.44
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-auto-scroll"
+    },
+    {
+      "id": "action-zone",
+      "viewport": "390x844",
+      "parent_id": "viewport",
+      "role": "action-zone",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0.8999999999999999,
+        "width": 1,
+        "height": 0.1
+      },
+      "min": {
+        "width": 0,
+        "height": 0
+      },
+      "max": {
+        "width": 1,
+        "height": 1
+      },
+      "anchor": "top-left",
+      "priority": 100,
+      "overflow_policy": "owned-inline-scroll"
+    },
+    {
+      "id": "result-summary",
+      "viewport": "1920x1080",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.35,
+        "height": 1
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "1920x1080",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.8200000000000001
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "1920x1080",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.8200000000000001,
+        "width": 1,
+        "height": 0.18
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    },
+    {
+      "id": "result-summary",
+      "viewport": "1366x768",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.35,
+        "height": 1
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "1366x768",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.8200000000000001
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "1366x768",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.8200000000000001,
+        "width": 1,
+        "height": 0.18
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    },
+    {
+      "id": "result-summary",
+      "viewport": "1366x600",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.35,
+        "height": 1
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "1366x600",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.8200000000000001
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "1366x600",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.8200000000000001,
+        "width": 1,
+        "height": 0.18
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    },
+    {
+      "id": "result-summary",
+      "viewport": "1024x600",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.35,
+        "height": 1
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "1024x600",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.8200000000000001
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "1024x600",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.8200000000000001,
+        "width": 1,
+        "height": 0.18
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    },
+    {
+      "id": "result-summary",
+      "viewport": "768x1024",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.3
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "768x1024",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.72
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "768x1024",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.72,
+        "width": 1,
+        "height": 0.28
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    },
+    {
+      "id": "result-summary",
+      "viewport": "390x844",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.3
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "390x844",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.72
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "390x844",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.72,
+        "width": 1,
+        "height": 0.28
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    },
+    {
+      "id": "result-summary",
+      "viewport": "1366x625",
+      "view": "result",
+      "parent_id": "screen",
+      "role": "result-summary-with-persistent-action",
+      "layout_model": "percentage-grid",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.35,
+        "height": 1
+      },
+      "overflow_policy": "hidden; summary-copy owns scroll; action is separate",
+      "priority": 100
+    },
+    {
+      "id": "result-summary-scroll",
+      "viewport": "1366x625",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "result-copy",
+      "layout_model": "block",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.8200000000000001
+      },
+      "overflow_policy": "auto",
+      "priority": 80
+    },
+    {
+      "id": "result-actions",
+      "viewport": "1366x625",
+      "view": "result",
+      "parent_id": "result-summary",
+      "role": "persistent-primary-action",
+      "layout_model": "flex",
+      "rect": {
+        "x": 0,
+        "y": 0.8200000000000001,
+        "width": 1,
+        "height": 0.18
+      },
+      "min": {
+        "height_px": 44
+      },
+      "overflow_policy": "no scroll",
+      "priority": 100
+    }
+  ],
+  "component_rects": [
+    {
+      "id": "enemy-panel",
+      "block_id": "screen",
+      "kind": "visual",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 0,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "question",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.25,
+        "y": 0,
+        "width": 0.5,
+        "height": 0.2
+      },
+      "visual_rect": {
+        "x": 0.25,
+        "y": 0,
+        "width": 0.5,
+        "height": 0.2
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 5,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "battle-meta",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.25,
+        "height": 0.2
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.25,
+        "height": 0.2
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 5,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "enemy-intent",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.75,
+        "y": 0,
+        "width": 0.25,
+        "height": 0.2
+      },
+      "visual_rect": {
+        "x": 0.75,
+        "y": 0,
+        "width": 0.25,
+        "height": 0.2
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 5,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "hero-actor",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.04,
+        "y": 0.24,
+        "width": 0.21,
+        "height": 0.58
+      },
+      "visual_rect": {
+        "x": 0.04,
+        "y": 0.24,
+        "width": 0.21,
+        "height": 0.58
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 2,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "enemy-actor",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.75,
+        "y": 0.24,
+        "width": 0.21,
+        "height": 0.58
+      },
+      "visual_rect": {
+        "x": 0.75,
+        "y": 0.24,
+        "width": 0.21,
+        "height": 0.58
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 2,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "battle-fx",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.25,
+        "y": 0.25,
+        "width": 0.5,
+        "height": 0.55
+      },
+      "visual_rect": {
+        "x": 0.25,
+        "y": 0.25,
+        "width": 0.5,
+        "height": 0.55
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 3,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": "pointer-events:none; intentional hit effects within stage only"
+    },
+    {
+      "id": "hero-vitals",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.02,
+        "y": 0.83,
+        "width": 0.28,
+        "height": 0.17
+      },
+      "visual_rect": {
+        "x": 0.02,
+        "y": 0.83,
+        "width": 0.28,
+        "height": 0.17
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 5,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "enemy-vitals",
+      "block_id": "enemy-panel",
+      "kind": "visual",
+      "rect": {
+        "x": 0.7,
+        "y": 0.83,
+        "width": 0.28,
+        "height": 0.17
+      },
+      "visual_rect": {
+        "x": 0.7,
+        "y": 0.83,
+        "width": 0.28,
+        "height": 0.17
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 5,
+      "scroll_context": null,
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "workspace-toolbar",
+      "block_id": "hand-zone",
+      "kind": "control",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.2
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.2
+      },
+      "hit_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.2
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": "hand-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "draft-target",
+      "block_id": "workspace-toolbar",
+      "kind": "control",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.26,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.26,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.26,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": null,
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "feedback-button",
+      "block_id": "action-zone",
+      "kind": "control",
+      "rect": {
+        "x": 0.58,
+        "y": 0,
+        "width": 0.42,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0.58,
+        "y": 0,
+        "width": 0.42,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0.58,
+        "y": 0,
+        "width": 0.42,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": null,
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": "Real button owns ellipsis summary; title has reserved width, full feedback in dialog."
+    },
+    {
+      "id": "hand-scroll",
+      "block_id": "hand-zone",
+      "kind": "visual",
+      "rect": {
+        "x": 0,
+        "y": 0.2,
+        "width": 1,
+        "height": 0.8
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0.2,
+        "width": 1,
+        "height": 0.8
+      },
+      "hit_rect": null,
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 1,
+      "scroll_context": "hand-scroll",
+      "collision_channels": [],
+      "notes": null
+    },
+    {
+      "id": "card-main",
+      "block_id": "hand-scroll",
+      "kind": "control",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.7
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.7
+      },
+      "hit_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 0.7
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 1,
+      "scroll_context": "hand-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": "repeated card owns no nested text scroll; control geometries are local to each repeated card"
+    },
+    {
+      "id": "drag-handle",
+      "block_id": "hand-scroll",
+      "kind": "control",
+      "rect": {
+        "x": 0,
+        "y": 0.7,
+        "width": 0.34,
+        "height": 0.3
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0.7,
+        "width": 0.34,
+        "height": 0.3
+      },
+      "hit_rect": {
+        "x": 0,
+        "y": 0.7,
+        "width": 0.34,
+        "height": 0.3
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 2,
+      "scroll_context": "hand-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "move-before",
+      "block_id": "hand-scroll",
+      "kind": "control",
+      "rect": {
+        "x": 0.34,
+        "y": 0.7,
+        "width": 0.33,
+        "height": 0.3
+      },
+      "visual_rect": {
+        "x": 0.34,
+        "y": 0.7,
+        "width": 0.33,
+        "height": 0.3
+      },
+      "hit_rect": {
+        "x": 0.34,
+        "y": 0.7,
+        "width": 0.33,
+        "height": 0.3
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 2,
+      "scroll_context": "hand-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "move-after",
+      "block_id": "hand-scroll",
+      "kind": "control",
+      "rect": {
+        "x": 0.67,
+        "y": 0.7,
+        "width": 0.33,
+        "height": 0.3
+      },
+      "visual_rect": {
+        "x": 0.67,
+        "y": 0.7,
+        "width": 0.33,
+        "height": 0.3
+      },
+      "hit_rect": {
+        "x": 0.67,
+        "y": 0.7,
+        "width": 0.33,
+        "height": 0.3
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 2,
+      "scroll_context": "hand-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "submit-button",
+      "block_id": "action-zone",
+      "kind": "control",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.18,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.18,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.18,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": "controls-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "note-button",
+      "block_id": "action-zone",
+      "kind": "control",
+      "rect": {
+        "x": 0.18,
+        "y": 0,
+        "width": 0.26,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0.18,
+        "y": 0,
+        "width": 0.26,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0.18,
+        "y": 0,
+        "width": 0.26,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": "controls-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "mulligan-button",
+      "block_id": "action-zone",
+      "kind": "control",
+      "rect": {
+        "x": 0.44,
+        "y": 0,
+        "width": 0.18,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0.44,
+        "y": 0,
+        "width": 0.18,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0.44,
+        "y": 0,
+        "width": 0.18,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": "controls-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "end-turn-button",
+      "block_id": "action-zone",
+      "kind": "control",
+      "rect": {
+        "x": 0.62,
+        "y": 0,
+        "width": 0.2,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0.62,
+        "y": 0,
+        "width": 0.2,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0.62,
+        "y": 0,
+        "width": 0.2,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": "controls-scroll",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "article-button",
+      "block_id": "hud",
+      "kind": "control",
+      "rect": {
+        "x": 0.65,
+        "y": 0,
+        "width": 0.2,
+        "height": 1
+      },
+      "visual_rect": {
+        "x": 0.65,
+        "y": 0,
+        "width": 0.2,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0.65,
+        "y": 0,
+        "width": 0.2,
+        "height": 1
+      },
+      "anchor": "parent-top-left",
+      "layer": "DOM/SVG",
+      "z_index": 4,
+      "scroll_context": "hud",
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "notes": null
+    },
+    {
+      "id": "hero-resources",
+      "block_id": "battle-field",
+      "kind": "status",
+      "rect": {
+        "x": 0.26,
+        "y": 0.6,
+        "width": 0.21,
+        "height": 0.36
+      },
+      "visual_rect": {
+        "x": 0.26,
+        "y": 0.6,
+        "width": 0.21,
+        "height": 0.36
+      },
+      "hit_rect": null,
+      "anchor": "hero-right-bottom",
+      "layer": "DOM",
+      "z_index": 5,
+      "collision_channels": [],
+      "notes": "Energy/block belong to hero, not global HUD; fx travel above text."
+    },
+    {
+      "id": "result-return-button",
+      "block_id": "result-actions",
+      "kind": "control",
+      "rect": {
+        "x": 0.05,
+        "y": 0.05,
+        "width": 0.9,
+        "height": 0.9
+      },
+      "visual_rect": {
+        "x": 0.05,
+        "y": 0.05,
+        "width": 0.9,
+        "height": 0.9
+      },
+      "hit_rect": {
+        "x": 0.05,
+        "y": 0.05,
+        "width": 0.9,
+        "height": 0.9
+      },
+      "anchor": "parent-center",
+      "layer": "DOM",
+      "z_index": 2,
+      "scroll_context": null,
+      "collision_channels": [
+        "ui-pointer"
+      ],
+      "min": {
+        "height_px": 44
+      },
+      "max": {
+        "width_px": 260
+      },
+      "notes": "Actual intrinsic button rectangle measured after render; never scrollIntoView before initial visibility test."
+    }
+  ],
+  "icon_specs": [
+    {
+      "id": "hero",
+      "selector": "#hero-actor",
+      "shape": "original inline SVG pen-wielding figure placeholder",
+      "visual_rect": {
+        "x": 0.04,
+        "y": 0.24,
+        "width": 0.21,
+        "height": 0.58
+      },
+      "hit_rect": null,
+      "z_index": 2,
+      "anchor": "left-ground",
+      "collision_channels": []
+    },
+    {
+      "id": "monster",
+      "selector": "#enemy-actor",
+      "shape": "original inline SVG blob placeholder; size constrained for elite and boss",
+      "visual_rect": {
+        "x": 0.75,
+        "y": 0.24,
+        "width": 0.21,
+        "height": 0.58
+      },
+      "hit_rect": null,
+      "z_index": 2,
+      "anchor": "right-ground",
+      "collision_channels": []
+    },
+    {
+      "id": "attack",
+      "selector": "#battle-fx",
+      "shape": "directional stroke/projectile and numeric text, not a gameplay collider",
+      "visual_rect": {
+        "x": 0.25,
+        "y": 0.25,
+        "width": 0.5,
+        "height": 0.55
+      },
+      "hit_rect": null,
+      "z_index": 3,
+      "anchor": "stage-center",
+      "collision_channels": []
+    },
+    {
+      "id": "route-events",
+      "shape": "◆ monster / ✦ elite / ♨ camp / ▥ shop / ♛ boss",
+      "visual_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "hit_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "z_index": 1,
+      "anchor": "node-center",
+      "collision_channels": [
+        "ui-pointer"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "type": "containment",
+      "viewport": "1920x1080",
+      "source_ids": [
+        "hud",
+        "screen",
+        "hand-zone",
+        "action-zone"
+      ],
+      "result": "pass",
+      "calculation": "root heights sum to 1, adjacent edges match",
+      "intentional": false
+    },
+    {
+      "type": "containment",
+      "viewport": "1366x768",
+      "source_ids": [
+        "hud",
+        "screen",
+        "hand-zone",
+        "action-zone"
+      ],
+      "result": "pass",
+      "calculation": "root heights sum to 1, adjacent edges match",
+      "intentional": false
+    },
+    {
+      "type": "containment",
+      "viewport": "1366x600",
+      "source_ids": [
+        "hud",
+        "screen",
+        "hand-zone",
+        "action-zone"
+      ],
+      "result": "pass",
+      "calculation": "root heights sum to 1, adjacent edges match",
+      "intentional": false
+    },
+    {
+      "type": "containment",
+      "viewport": "1024x600",
+      "source_ids": [
+        "hud",
+        "screen",
+        "hand-zone",
+        "action-zone"
+      ],
+      "result": "pass",
+      "calculation": "root heights sum to 1, adjacent edges match",
+      "intentional": false
+    },
+    {
+      "type": "containment",
+      "viewport": "768x1024",
+      "source_ids": [
+        "hud",
+        "screen",
+        "hand-zone",
+        "action-zone"
+      ],
+      "result": "pass",
+      "calculation": "root heights sum to 1, adjacent edges match",
+      "intentional": false
+    },
+    {
+      "type": "containment",
+      "viewport": "390x844",
+      "source_ids": [
+        "hud",
+        "screen",
+        "hand-zone",
+        "action-zone"
+      ],
+      "result": "pass",
+      "calculation": "root heights sum to 1, adjacent edges match",
+      "intentional": false
+    },
+    {
+      "type": "overlap",
+      "source_ids": [
+        "battle-fx",
+        "hero-actor",
+        "enemy-actor"
+      ],
+      "result": "pass",
+      "intentional": true,
+      "notes": "Only named contact sockets may overlap actor; title/vitals above effect layer. No 2D/3D physics claimed."
+    },
+    {
+      "type": "overflow",
+      "source_ids": [
+        "hand-scroll",
+        "controls-scroll",
+        "hud"
+      ],
+      "result": "pass",
+      "intentional": true,
+      "notes": "Each owns scrollbar. Cards grow intrinsically, minimum sentence font18px. Desktop horizontal; narrow vertical. No body scrolling."
+    },
+    {
+      "type": "hit-collision",
+      "source_ids": [
+        "battle-fx",
+        "card-main",
+        "drag-handle",
+        "move-before",
+        "move-after"
+      ],
+      "result": "pass",
+      "intentional": false,
+      "notes": "FX noninteractive; card-main and lower control row are disjoint. Confirm with elementFromPoint after implementation."
+    },
+    {
+      "type": "overflow",
+      "source_ids": [
+        "feedback-button",
+        "feedback-summary",
+        "controls-scroll"
+      ],
+      "result": "pass",
+      "intentional": true,
+      "notes": "Feedback child has min-width:0, overflow:hidden, ellipsis; independent from horizontally scrolling controls. No text can paint over adjacent controls."
+    },
+    {
+      "type": "containment",
+      "source_ids": [
+        "result-return-button",
+        "result-actions",
+        "result-summary"
+      ],
+      "result": "pass",
+      "intentional": false,
+      "notes": "Primary action outside copy scroller; grid footer reserves minimum44px in each target profile."
+    },
+    {
+      "type": "overflow",
+      "source_ids": [
+        "result-summary-scroll",
+        "result-article"
+      ],
+      "result": "pass",
+      "intentional": true,
+      "notes": "Only copy and article scroll; neither may move the primary action."
+    }
+  ],
+  "responsive_variants": [
+    {
+      "variant": "desktop",
+      "rows": [
+        0.08,
+        0.42,
+        0.42,
+        0.08
+      ],
+      "cards": "horizontal intrinsic-height strip, x/y scroll owner hand-scroll"
+    },
+    {
+      "variant": "narrow",
+      "rows": [
+        0.1,
+        0.36,
+        0.44,
+        0.1
+      ],
+      "cards": "vertical intrinsic-height cards; same left/right battlefield remains"
+    }
+  ],
+  "warnings": [
+    {
+      "severity": "info",
+      "source_ids": [
+        "hand-scroll"
+      ],
+      "viewport": "all",
+      "intentional": true,
+      "threshold": "sentence font >=18px",
+      "calculation": "minimum card-content height may exceed card-zone height at600px",
+      "resolution": "workspace scroll owns overflow; no clipped inner sentence"
+    }
+  ],
+  "assumptions": [
+    "actor art is placeholder; full art/animation outside this iteration",
+    "version2 save retains draft/hand order",
+    "no extra genre/formula hints for hero,tank,mage"
+  ],
+  "unresolved_questions": [],
+  "verification": {
+    "status": "verified",
+    "source_sha256": "51ce3f21214e7a4445ca8526932ad626764370937a0fe54a15dcba9fc1617df0",
+    "result_evidence": "workspace/composition-roguelike-card-game/card-workspace-2026-10-26/result-action-repair-2026-10-27/result-evidence.json",
+    "result_profiles_tested": 9,
+    "battle_profiles_tested": 7,
+    "dom_evidence": "workspace/composition-roguelike-card-game/card-workspace-2026-10-26/result-action-repair-2026-10-27/dom-evidence.json",
+    "browser_evidence": "workspace/composition-roguelike-card-game/card-workspace-2026-10-26/result-action-repair-2026-10-27/browser-evidence.json",
+    "feedback_evidence": "workspace/composition-roguelike-card-game/card-workspace-2026-10-26/result-action-repair-2026-10-27/feedback-evidence.json",
+    "notes": "Author Chrome/CDP fixture-based result-page verification; nine viewport win/loss branches, no-scroll hit tests, real wheel and keyboard. Previous AGY actual play applies only to baseline6f0771d."
+  }
+}
