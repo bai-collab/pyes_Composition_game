@@ -1418,11 +1418,11 @@ test('pencil 題目使用核准的客廳四段、十二句與句型',()=>{
   assert.deepEqual(normal(topic.paragraphs.map(paragraph=>paragraph.pattern)),[['a','a','b'],['a','a','b'],['a','a','b'],['a','b','b']]);
 });
 
-test('客廳四段可正確提交，第三段誤放第二段整段句子會列出第 1、2、3 句',()=>{
+test('客廳四段可正確提交，第三段誤放第二段整段句子會提示換別段',()=>{
   const {game}=battle('monster','pencil','hero'),b=game.run.battle;
   for(let index=0;index<4;index++){b.target=index;b.draft=pencilParagraphCards(game,index,`pencil-valid-${index}`);assert.equal(game.evaluate().valid,true,`第 ${index+1} 段可完成`);}
   b.target=2;b.enemy.hp=10000;b.draft=pencilParagraphCards(game,1,'pencil-wrong-segment');
-  assert.equal(game.evaluate().valid,false);assert.equal(game.submit(),false);assert.ok(game.notice.startsWith('草稿第 1、2、3 句不是這一段的句子。'),game.notice);
+  assert.equal(game.evaluate().valid,false);assert.equal(game.submit(),false);assert.ok(game.notice.startsWith('這幾句是完整的一段，但不是第 3 段，換別段試試看。'),game.notice);assert.equal(b.misplacedMarks.length,3);assert.deepEqual(normal(b.misplacedMarks),normal(b.draft.map(card=>card.bankId)));
 });
 
 test('舊文具盒存檔只在讀入記憶體時遷移，四個牌堆可繼續提交並正常保存',()=>{
@@ -1898,4 +1898,83 @@ test('提交標記存檔只接受布林值，且缺欄位的舊存檔仍可讀�
   for(const pile of piles)for(const card of legacy.run.battle[pile])delete card.submitted;
   assert.equal(x.validRun(legacy.run),true);
   assert.equal(new x.Game(memory(JSON.stringify(legacy))).storageOK,true);
+});
+
+test('完整的其他段落提示換段、不洩漏正確段號並沿用第一階墨水折扣',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic(),target=2,other=1;
+  assert(t.paragraphs[other].pattern.length>1,'第二段有多句，可驗證不完整草稿');
+  b.required=[target];assert.equal(g.setTarget(target),true);b.enemy.hp=10000;
+  b.draft=metaParagraphCards(g,t,other,'other-paragraph-monster');
+  assert.equal(g.submit(),false);
+  const expected='這幾句是完整的一段，但不是第 3 段，換別段試試看。';
+  assert.ok(g.notice.startsWith(expected),g.notice);
+  assert(!g.notice.includes('第 2 段'));
+  assert.deepEqual(normal(b.misplacedMarks),normal(b.draft.map(card=>card.bankId)));
+  const feedbackHtml=x.elements.get('action-zone').innerHTML,handHtml=x.elements.get('hand-zone').innerHTML;
+  assert(feedbackHtml.includes(expected));
+  assert(!feedbackHtml.includes('第 2 段'));
+  const misplacedText=(handHtml.match(/<span class="misplaced-label">[^<]*<\/span>/g)||[]).join(' ');
+  assert.equal((misplacedText.match(/不是這一段/g)||[]).length,b.draft.length);
+  assert(!misplacedText.includes('第 2 段'));
+  const hiddenParagraphName=t.paragraphs[other].label,attributes=renderedAttributes(feedbackHtml+handHtml);
+  assert(!hiddenParagraphName||!attributes.some(value=>value.includes(hiddenParagraphName)));
+  assert(!attributes.some(value=>value.includes('第 2 段')));
+
+  g.run.earnedInk=10;b.inkBase=7;
+  assert.equal(g.setTarget(other),true);assert.deepEqual(normal(b.misplacedMarks),[]);
+  assert.equal(g.evaluate().valid,true);
+  b.enemy.hp=0;
+  assert.equal(g.submit(),true);
+  assert.equal(b.completed.some(item=>item.index===other),true);
+  assert.equal(g.run.view,'reward');
+  assert.equal(b.scaffold[target].level,1);
+  assert.equal(g.run.earnedInk,10,'基礎 7 點加上 5 點後，第一階保留 3 點');
+});
+
+test('其他段落只完成部分時仍回報原本的錯句原因',()=>{
+  const {game:g}=renderedBattle('monster','teacher','hero'),b=g.run.battle,t=g.topic(),target=2,other=1;
+  g.setTarget(target);b.enemy.hp=10000;
+  const cards=metaParagraphCards(g,t,other,'partial-other-paragraph');assert(cards.length>1);
+  b.draft=cards.slice(0,-1);
+  assert.equal(g.submit(),false);
+  assert.ok(g.notice.startsWith('草稿第 '),g.notice);
+  assert(!g.notice.startsWith('這幾句是完整的一段'));
+});
+
+test('已完成的其他段落不觸發換段提示',()=>{
+  const {game:g}=renderedBattle('monster','teacher','hero'),b=g.run.battle,t=g.topic(),target=2,other=1;
+  g.setTarget(target);b.enemy.hp=10000;b.completed.push({index:other,text:'已完成段落'});
+  b.draft=metaParagraphCards(g,t,other,'completed-other-paragraph');
+  assert.equal(g.submit(),false);
+  assert.ok(g.notice.startsWith('草稿第 '),g.notice);
+  assert(!g.notice.startsWith('這幾句是完整的一段'));
+});
+
+test('頭目戰草稿是後段完整段落時不顯示換段提示',()=>{
+  const {game:g}=renderedBattle('boss','teacher','hero'),b=g.run.battle,t=g.topic(),other=1;
+  b.enemy.hp=10000;b.draft=metaParagraphCards(g,t,other,'boss-other-paragraph');
+  assert.equal(b.phase,0);
+  assert.equal(g.submit(),false);
+  assert(!g.notice.startsWith('這幾句是完整的一段'));
+  assert.ok(g.notice.startsWith('草稿第 '),g.notice);
+});
+
+test('隱士與老師組出完整其他段落時不顯示新原因',()=>{
+  for(const char of ['hermit','teacher']){
+    const x=renderedBattle('monster','teacher',char),g=x.game,b=g.run.battle,t=g.topic(),target=2,other=1;
+    g.setTarget(target);b.enemy.hp=10000;b.draft=metaParagraphCards(g,t,other,'hidden-other-paragraph-'+char);
+    assert.equal(g.submit(),false);
+    assert(!g.notice.includes('這幾句是完整的一段'),char+': '+g.notice);
+    assert.equal(b.scaffold[target],undefined);
+    assert(!x.elements.get('action-zone').innerHTML.includes('這幾句是完整的一段'));
+  }
+});
+
+test('菁英戰的另一個未完成弱點段落可觸發換段提示',()=>{
+  const {game:g}=renderedBattle('elite','teacher','hero'),b=g.run.battle,t=g.topic(),target=2,other=1;
+  b.required=[target,other];g.setTarget(target);b.enemy.hp=10000;
+  b.draft=metaParagraphCards(g,t,other,'elite-other-paragraph');
+  assert.equal(g.submit(),false);
+  assert.ok(g.notice.startsWith('這幾句是完整的一段，但不是第 3 段，換別段試試看。'),g.notice);
+  assert.deepEqual(normal(b.misplacedMarks),normal(b.draft.map(card=>card.bankId)));
 });
