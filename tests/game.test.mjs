@@ -339,7 +339,7 @@ test('隨手筆記按鈕在草稿三句時停用、兩句時可用',()=>{
 });
 test('11 個題目對應指定動畫集與完整播放網址',()=>{
   const x=boot(),{game,TOPICS,TEACHING_VIDEOS,ANIMATION_BASE}=x;
-  const expected={teacher:['g3-01-person-skeleton','g3-02-person-layers'],pencil:['g3-03-object'],campus:['g4-03-scene-skeleton','g4-04-scene-layers'],trip:['g4-01-event-skeleton','g4-02-event-layers'],brave:['g6-01-person-focus-skeleton','g6-02-person-focus-layers'],special:['g6-03-event-focus-skeleton','g6-04-event-focus-layers'],desk:['g4-05-method-skeleton','g4-06-method-layers'],environment:['g5-01-howto-skeleton'],reading:['g5-02-why-skeleton'],humility:['g6-05-talk-skeleton'],book:['g6-06-what-skeleton','g6-07-argument-layers']};
+  const expected={teacher:['g3-01-person-skeleton','g3-02-person-layers'],pencil:['g3-03-object'],campus:['g4-03-scene-skeleton','g4-04-scene-layers'],trip:['g4-01-event-skeleton','g4-02-event-layers'],brave:['g6-01-person-focus-skeleton','g6-02-person-focus-layers'],special:['g6-03-event-focus-skeleton','g6-04-event-focus-layers'],desk:['g4-05-method-skeleton'],environment:['g5-01-howto-skeleton'],reading:['g5-02-why-skeleton'],humility:['g6-05-talk-skeleton'],book:['g6-06-what-skeleton','g6-07-argument-layers']};
   const expectedIds=Object.keys(expected).sort();
   assert.equal(ANIMATION_BASE,'https://bai-collab.github.io/pyes_Composition/');
   assert.deepEqual(Object.keys(TEACHING_VIDEOS).sort(),expectedIds);
@@ -1467,7 +1467,7 @@ test('四個題目的段名、句子、種類順序與書桌教學集符合核�
     assert.deepEqual(normal(topic.paragraphs.map(({label,units})=>({label,units}))),item.paragraphs,item.id+' exact paragraph content');
     assert.deepEqual(normal(topic.paragraphs.map(paragraph=>paragraph.pattern)),item.paragraphs.map(paragraph=>paragraph.units.map(([kind])=>kind)),item.id+' patterns');
   }
-  assert.deepEqual(normal(TEACHING_VIDEOS.desk),['g4-05-method-skeleton','g4-06-method-layers']);
+  assert.deepEqual(normal(TEACHING_VIDEOS.desk),['g4-05-method-skeleton']);
 });
 
 test('其餘七題的題目資料與改版前備份完全一致',async()=>{
@@ -1728,4 +1728,174 @@ test('短視窗卡片標記併入類型列並維持說明字級',()=>{
   assert.match(html,/.card-meta \.misplaced-label\{align-self:center\}/);
   assert.match(html,/@media\(min-width:850px\) and \(max-height:640px\)\{\s*\.card-main\{gap:2px;padding:4px\}\s*\.card-effect\{font-size:12px;line-height:1\.05;padding-top:1px\}\s*\}/);
   assert.match(html,/@media\(max-width:849px\) and \(max-height:720px\)\{\s*\.card-main\{gap:1px;padding:2px\}\s*\.card-effect\{font-size:12px;line-height:1\.05;padding-top:0\}\s*\}/);
+});
+
+test('已結算傷害的攻擊卡同回合撤回不退能量並保留標記',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const target=t.paragraphs.findIndex(paragraph=>paragraph.pattern.length>1&&paragraph.pattern.some(kind=>ATTACK_VALUES[kind]));
+  assert(target>=0,'找到包含攻擊卡且不只一句的段落');
+  b.required=[target];assert.equal(g.setTarget(target),true);b.enemy.hp=b.enemy.maxHp=1000;
+  const kind=t.paragraphs[target].pattern.find(item=>ATTACK_VALUES[item]);
+  const sentence=t.bank.find(item=>item.kind===kind&&item.allowed.includes(target));
+  assert(sentence,'攻擊卡屬於選定段落');
+  const card=cardFor(g,sentence,'no-refund-after-failed-submit'),cost=g.cost(card);
+  assert(cost>0);b.energy=g.energyLimit(b.round);const energyBefore=b.energy;b.hand=[card];
+  assert.equal(g.play(card.id),true);assert.equal(b.energy,energyBefore-cost);
+  const played=b.draft.find(item=>item.id===card.id);
+  assert.equal(g.submit(),false);assert.equal(played.damageSpent,true);
+  const energyAfterFailure=b.energy;
+  assert.equal(g.undo(played.id),true);
+  assert.equal(b.energy,energyAfterFailure);
+  const returned=b.hand.find(item=>item.id===card.id);
+  assert(returned,'撤回後卡片回到手牌');assert.equal(returned.damageSpent,true);
+  assert.equal(g.notice,'已撤回；這張已提交過，不退還能量。');
+});
+
+test('未結算攻擊卡同回合撤回仍退還能量並保留原提示',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const sentence=t.bank.find(item=>ATTACK_VALUES[item.kind]&&item.allowed.includes(0));
+  assert(sentence,'找到可在第一段使用的攻擊卡');assert.equal(g.setTarget(0),true);
+  const card=cardFor(g,sentence,'refund-unsettled-attack'),cost=g.cost(card);
+  b.energy=g.energyLimit(b.round);const energyBefore=b.energy;b.hand=[card];
+  assert.equal(g.play(card.id),true);assert.equal(b.energy,energyBefore-cost);
+  assert.equal(g.undo(card.id),true);assert.equal(b.energy,energyBefore);
+  assert.equal(b.hand.find(item=>item.id===card.id).damageSpent,false);
+  assert.equal(g.notice,'已撤回，退還當回合實付的能量並扣回格擋。');
+});
+
+test('撤回已結算攻擊卡後再次打出會扣能量且成功提交不重複計算傷害',()=>{
+  const topics=boot().TOPICS;let chosen=null;
+  for(const topic of topics){for(let index=0;index<topic.paragraphs.length;index++){
+    const pattern=topic.paragraphs[index].pattern;
+    if(pattern.length>1&&pattern.filter(kind=>ATTACK_VALUES[kind]).length===1){chosen={topic,index,pattern};break;}
+  }if(chosen)break;}
+  assert(chosen,'找到只有一張攻擊卡的完整段落');
+  const x=renderedBattle('monster',chosen.topic.id,'hero'),g=x.game,b=g.run.battle;
+  b.required=[chosen.index];assert.equal(g.setTarget(chosen.index),true);b.enemy.hp=b.enemy.maxHp=1000;
+  const cards=metaParagraphCards(g,chosen.topic,chosen.index,'replayed-attack'),attackIndex=cards.findIndex(card=>ATTACK_VALUES[card.kind]);
+  assert(attackIndex>=0);const attack=cards[attackIndex],cost=g.cost(attack),totalCost=cards.reduce((total,card)=>total+g.cost(card),0);
+  assert(cost>0);b.energy=totalCost+cost;b.hand=[attack];const energyBefore=b.energy;
+  assert.equal(g.play(attack.id),true);assert.equal(b.energy,energyBefore-cost);
+  const firstPlay=b.draft[0];assert.equal(g.submit(),false);assert.equal(firstPlay.damageSpent,true);
+  const energyAfterFailure=b.energy;
+  assert.equal(g.undo(firstPlay.id),true);assert.equal(b.energy,energyAfterFailure);
+  assert.equal(g.play(attack.id),true);assert.equal(b.energy,energyAfterFailure-cost);
+  const replayed=b.draft.find(card=>card.id===attack.id);assert.equal(replayed.damageSpent,true);
+  b.hand.push(...cards.filter(card=>card.id!==attack.id));
+  for(const card of cards.filter(item=>item.id!==attack.id))assert.equal(g.play(card.id),true);
+  if(attackIndex>0)assert.equal(g.reorder('draft',attack.id,attackIndex),true);
+  assert.equal(g.evaluate().valid,true);
+  const hpBeforeSuccessfulSubmit=b.enemy.hp;
+  assert.equal(g.submit(),true);assert.equal(b.enemy.hp,hpBeforeSuccessfulSubmit);
+});
+
+test('跨回合撤回仍不補發能量並保留原提示',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const sentence=t.bank.find(item=>ATTACK_VALUES[item.kind]);
+  assert(sentence);const card={...cardFor(g,sentence,'cross-turn-undo'),playedRound:b.round-1,paidCost:1,appliedBlock:0};
+  b.draft=[card];b.energy=g.energyLimit(b.round);
+  assert.equal(g.undo(card.id),true);assert.equal(b.energy,g.energyLimit(b.round));
+  assert.equal(g.notice,'已撤回；跨回合不補發能量，格擋已在回合結束清空。');
+});
+
+test('提交失敗的格擋卡同回合撤回不退能量並保留格擋',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const target=t.paragraphs.findIndex(p=>p.pattern.length>1&&p.pattern.some(kind=>['b','step','summary'].includes(kind)));
+  assert(target>=0,'找到含格擋句且不只一句的段落');
+  assert.equal(g.setTarget(target),true);
+  const kind=t.paragraphs[target].pattern.find(item=>['b','step','summary'].includes(item));
+  const sentence=t.bank.find(item=>item.kind===kind&&item.allowed.includes(target));
+  assert(sentence,'找到適用於目標段的格擋句');
+  const card=cardFor(g,sentence,'failed-block-no-refund'),cost=g.cost(card),block=g.blockValue(card);
+  b.energy=g.energyLimit(b.round);b.hand=[card];
+  const energyBefore=b.energy,blockBefore=b.block;
+  assert.equal(g.play(card.id),true);assert.equal(b.energy,energyBefore-cost);assert.equal(b.block,blockBefore+block);
+  assert.equal(g.submit(),false);
+  const energyAfterFailure=b.energy,blockAfterFailure=b.block,played=b.draft.find(item=>item.id===card.id);
+  assert(played);assert.equal(played.submitted,true);
+  assert.equal(g.undo(card.id),true);
+  assert.equal(b.energy,energyAfterFailure);assert.equal(b.block,blockAfterFailure);
+  const returned=b.hand.find(item=>item.id===card.id);assert(returned);assert.equal(returned.submitted,true);
+  assert.equal(g.notice,'已撤回；這張已提交過，不退還能量。');
+});
+
+test('攻擊卡提交失敗後撤回仍不退能量並保留提交標記',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const target=t.paragraphs.findIndex(p=>p.pattern.length>1&&p.pattern.some(kind=>ATTACK_VALUES[kind]));
+  assert(target>=0,'找到包含攻擊卡且不只一句的段落');
+  b.required=[target];assert.equal(g.setTarget(target),true);b.enemy.hp=b.enemy.maxHp=1000;
+  const kind=t.paragraphs[target].pattern.find(item=>ATTACK_VALUES[item]);
+  const sentence=t.bank.find(item=>item.kind===kind&&item.allowed.includes(target));
+  assert(sentence,'攻擊句屬於選定段落');
+  const card=cardFor(g,sentence,'failed-attack-no-refund'),cost=g.cost(card);
+  b.energy=g.energyLimit(b.round);b.hand=[card];const energyBefore=b.energy;
+  assert.equal(g.play(card.id),true);assert.equal(b.energy,energyBefore-cost);
+  const played=b.draft.find(item=>item.id===card.id);
+  assert.equal(g.submit(),false);assert.equal(played.damageSpent,true);assert.equal(played.submitted,true);
+  const energyAfterFailure=b.energy;
+  assert.equal(g.undo(card.id),true);assert.equal(b.energy,energyAfterFailure);
+  const returned=b.hand.find(item=>item.id===card.id);assert(returned);assert.equal(returned.submitted,true);
+  assert.equal(g.notice,'已撤回；這張已提交過，不退還能量。');
+});
+
+test('未提交格擋卡同回合撤回仍退能量並扣回格擋',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const target=t.paragraphs.findIndex(p=>p.pattern.length>1&&p.pattern.some(kind=>['b','step','summary'].includes(kind)));
+  assert(target>=0,'找到含格擋句且不只一句的段落');
+  assert.equal(g.setTarget(target),true);
+  const kind=t.paragraphs[target].pattern.find(item=>['b','step','summary'].includes(item));
+  const sentence=t.bank.find(item=>item.kind===kind&&item.allowed.includes(target));
+  assert(sentence);
+  const card=cardFor(g,sentence,'unsubmitted-block-refund'),cost=g.cost(card),block=g.blockValue(card);
+  b.energy=g.energyLimit(b.round);b.hand=[card];const energyBefore=b.energy,blockBefore=b.block;
+  assert.equal(g.play(card.id),true);assert.equal(b.energy,energyBefore-cost);assert.equal(b.block,blockBefore+block);
+  assert.equal(b.draft[0].submitted,false);
+  assert.equal(g.undo(card.id),true);
+  assert.equal(b.energy,energyBefore);assert.equal(b.block,blockBefore);
+  assert.equal(g.notice,'已撤回，退還當回合實付的能量並扣回格擋。');
+});
+
+test('提交過的格擋卡重打會重設提交標記並只撤銷新效果',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const target=t.paragraphs.findIndex(p=>p.pattern.length>1&&p.pattern.some(kind=>['b','step','summary'].includes(kind)));
+  assert(target>=0,'找到含格擋句且不只一句的段落');
+  assert.equal(g.setTarget(target),true);
+  const kind=t.paragraphs[target].pattern.find(item=>['b','step','summary'].includes(item));
+  const sentence=t.bank.find(item=>item.kind===kind&&item.allowed.includes(target));
+  assert(sentence);
+  const card=cardFor(g,sentence,'replayed-submitted-block'),cost=g.cost(card),block=g.blockValue(card);
+  b.energy=g.energyLimit(b.round);b.hand=[card];
+  assert.equal(g.play(card.id),true);assert.equal(g.submit(),false);
+  const energyAfterFailure=b.energy;assert.equal(b.draft[0].submitted,true);
+  const firstBlock=b.block;assert(firstBlock>=block);
+  assert.equal(g.undo(card.id),true);assert.equal(b.energy,energyAfterFailure);assert.equal(b.block,firstBlock);
+  assert.equal(b.hand.find(item=>item.id===card.id).submitted,true);
+  assert.equal(g.play(card.id),true);assert.equal(b.energy,energyAfterFailure-cost);assert.equal(b.block,firstBlock+block);
+  const replay=b.draft.find(item=>item.id===card.id);assert(replay);assert.equal(replay.submitted,false);
+  assert.equal(g.undo(card.id),true);assert.equal(b.energy,energyAfterFailure);assert.equal(b.block,firstBlock);
+  assert.equal(b.hand.find(item=>item.id===card.id).submitted,false);
+});
+
+test('頭目目標段與階段不一致的失敗提交會標記所有草稿卡',()=>{
+  const x=battle('boss'),g=x.game,b=g.run.battle;
+  putParagraph(x,1);
+  assert.equal(b.phase,0);assert.equal(b.target,1);assert.equal(g.evaluate().valid,true);
+  assert.equal(g.submit(),false);assert(b.draft.length>0);assert(b.draft.every(card=>card.submitted===true));
+  assert.equal(b.failedSubmits,1);
+});
+
+test('提交標記存檔只接受布林值，且缺欄位的舊存檔仍可讀取',()=>{
+  const x=battle('monster','teacher','hero'),g=x.game,b=g.run.battle;
+  const toDiscard=b.hand.pop();assert(toDiscard);g.discardCards([toDiscard]);
+  const material=b.hand.find(card=>card.type==='material');assert(material);assert.equal(g.play(material.id),true);
+  const envelope=JSON.parse(x.storage.getItem(x.SAVE_KEY)),piles=['hand','draw','discard','draft'];
+  const withSubmitted=normal(envelope);
+  for(const pile of piles){assert(withSubmitted.run.battle[pile].length>0,pile+' has a card');withSubmitted.run.battle[pile][0].submitted=true;}
+  assert.equal(x.validRun(withSubmitted.run),true);
+  const restored=new x.Game(memory(JSON.stringify(withSubmitted)));assert.equal(restored.storageOK,true);
+  for(const pile of piles){assert.equal(restored.run.battle[pile][0].submitted,true,pile+' keeps submitted marker');const malformed=normal(withSubmitted);malformed.run.battle[pile][0].submitted='yes';assert.equal(x.validRun(malformed.run),false,pile+' rejects non-boolean');assert.equal(new x.Game(memory(JSON.stringify(malformed))).storageOK,false,pile+' rejects malformed save');}
+  const legacy=normal(withSubmitted);
+  for(const pile of piles)for(const card of legacy.run.battle[pile])delete card.submitted;
+  assert.equal(x.validRun(legacy.run),true);
+  assert.equal(new x.Game(memory(JSON.stringify(legacy))).storageOK,true);
 });
