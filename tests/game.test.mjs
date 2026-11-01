@@ -1418,11 +1418,11 @@ test('pencil 題目使用核准的客廳四段、十二句與句型',()=>{
   assert.deepEqual(normal(topic.paragraphs.map(paragraph=>paragraph.pattern)),[['a','a','b'],['a','a','b'],['a','a','b'],['a','b','b']]);
 });
 
-test('客廳四段可正確提交，第三段誤放第二段句子會指出第 1 句',()=>{
+test('客廳四段可正確提交，第三段誤放第二段整段句子會列出第 1、2、3 句',()=>{
   const {game}=battle('monster','pencil','hero'),b=game.run.battle;
   for(let index=0;index<4;index++){b.target=index;b.draft=pencilParagraphCards(game,index,`pencil-valid-${index}`);assert.equal(game.evaluate().valid,true,`第 ${index+1} 段可完成`);}
   b.target=2;b.enemy.hp=10000;b.draft=pencilParagraphCards(game,1,'pencil-wrong-segment');
-  assert.equal(game.evaluate().valid,false);assert.equal(game.submit(),false);assert.ok(game.notice.startsWith('草稿第 1 句不是這一段的句子。'),game.notice);
+  assert.equal(game.evaluate().valid,false);assert.equal(game.submit(),false);assert.ok(game.notice.startsWith('草稿第 1、2、3 句不是這一段的句子。'),game.notice);
 });
 
 test('舊文具盒存檔只在讀入記憶體時遷移，四個牌堆可繼續提交並正常保存',()=>{
@@ -1591,4 +1591,141 @@ test('四題舊戰鬥存檔各牌堆按舊句映射；記憶體遷移可繼續�
     assert.equal(rejected.storageOK,false,topicId+' unknown sentence rejects');
     assert.equal(badStorage.getItem(SAVE_KEY),badRaw,topicId+' rejected save is unchanged');
   }
+});
+
+
+test('放錯句回饋列出全部句次、標記兩張草稿卡且只算一次失敗',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const first=t.bank.find(s=>s.text==='老師每天陪我們上課，也照顧我們的心情。');
+  const second=t.bank.find(s=>s.text==='放學後，老師還留在教室整理大家的作品。');
+  assert(first&&second,'the screenshot sentences exist in the teacher topic');
+  b.required=[1];g.setTarget(1);b.enemy.hp=b.enemy.maxHp=1000;
+  b.draft=[cardFor(g,first,'misplaced-teacher-four'),cardFor(g,second,'misplaced-teacher-three')];
+  const failuresBefore=b.failedSubmits??0;
+  assert.equal(g.submit(),false);
+  assert.ok(g.notice.startsWith('草稿第 1、2 句不是這一段的句子。'),g.notice);
+  assert.match(g.notice,/依目前破解程度造成 50% 傷害（\d+ 點）。草稿保留，可撤回或補句再交。$/);
+  assert.equal(b.failedSubmits,failuresBefore+1);
+  assert.deepEqual(normal(b.misplacedMarks),[first.id,second.id]);
+  const html=x.elements.get('hand-zone').innerHTML;
+  const marked=[...html.matchAll(/<article class="[^"]*misplaced-card[^"]*"[\s\S]*?<\/article>/g)].map(m=>m[0]);
+  assert.equal(marked.length,2);
+  for(const card of marked){
+    assert(card.includes('<span class="misplaced-label">不是這一段</span>'));
+    assert(renderedAttributes(card).some(value=>value.includes('不是這一段')));
+    for(const token of ['第 3 段','第 4 段','課後的陪伴','感謝與希望'])assert(!card.includes(token),token+' leaked in the card');
+    for(const value of renderedAttributes(card))for(const token of ['第 3 段','第 4 段','課後的陪伴','感謝與希望'])assert(!value.includes(token),token+' leaked in an attribute');
+  }
+});
+
+test('只有一句放錯時仍保留原本的單句回饋',()=>{
+  const {game:g}=renderedBattle('monster','teacher','hero'),b=g.run.battle,t=g.topic();
+  const wrong=t.bank.find(s=>s.text==='老師每天陪我們上課，也照顧我們的心情。');
+  b.required=[1];g.setTarget(1);b.enemy.hp=b.enemy.maxHp=1000;b.draft=[cardFor(g,wrong,'one-misplaced')];
+  assert.equal(g.submit(),false);
+  assert.ok(g.notice.startsWith('草稿第 1 句不是這一段的句子。'),g.notice);
+  assert.equal(b.misplacedMarks.length,1);
+});
+
+test('撤回與切換目標會移除放錯標記，標記跟著 bankId 重排',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const wrong=t.bank.find(s=>s.text==='老師每天陪我們上課，也照顧我們的心情。');
+  b.required=[1];g.setTarget(1);b.enemy.hp=b.enemy.maxHp=1000;b.draft=[cardFor(g,wrong,'undo-misplaced')];
+  assert.equal(g.submit(),false);assert.deepEqual(normal(b.misplacedMarks),[wrong.id]);
+  assert.equal(g.undo('undo-misplaced'),true);assert.deepEqual(normal(b.misplacedMarks),[]);
+  assert(!x.elements.get('hand-zone').innerHTML.includes('misplaced-label'));
+  const right=t.bank.find(s=>s.allowed.includes(1)),otherWrong=t.bank.find(s=>!s.allowed.includes(1));
+  assert(right&&otherWrong);
+  b.draft=[cardFor(g,right,'reorder-right'),cardFor(g,otherWrong,'reorder-wrong')];
+  assert.equal(g.submit(),false);assert.deepEqual(normal(b.misplacedMarks),[otherWrong.id]);
+  assert.equal(g.reorder('draft','reorder-wrong',0),true);
+  assert.equal(b.draft[0].bankId,otherWrong.id);
+  const markup=x.elements.get('hand-zone').innerHTML;
+  const marked=markup.match(/<article class="[^"]*misplaced-card[^"]*" data-card-id="([^"]+)"/);
+  assert.equal(marked?.[1],'reorder-wrong');
+  g.setTarget(2);assert.deepEqual(normal(b.misplacedMarks),[]);
+  assert(!x.elements.get('hand-zone').innerHTML.includes('misplaced-label'));
+});
+
+test('成功提交會清除放錯標記',()=>{
+  const {game:g}=renderedBattle('monster','teacher','hero'),b=g.run.battle,t=g.topic(),target=1,used=new Set();
+  b.required=[target];g.setTarget(target);b.enemy.hp=b.enemy.maxHp=1000;
+  b.draft=t.paragraphs[target].pattern.map((kind,index)=>{
+    const sentence=t.bank.find(s=>s.kind===kind&&s.allowed.includes(target)&&!used.has(s.id));
+    assert(sentence,'a distinct sentence exists for '+kind);used.add(sentence.id);
+    return cardFor(g,sentence,'valid-'+index);
+  });
+  b.misplacedMarks=[b.draft[0].bankId];
+  assert.equal(g.submit(),true);assert.deepEqual(normal(b.misplacedMarks),[]);assert.equal(b.draft.length,0);
+});
+
+test('舊存檔缺少 misplacedMarks 仍可讀，錯誤標記值會拒絕且不覆寫',()=>{
+  const x=battle('monster','teacher','hero'),saved=JSON.parse(x.storage.getItem(x.SAVE_KEY));
+  delete saved.run.battle.misplacedMarks;
+  assert.equal(x.validRun(saved.run),true);
+  const oldRaw=JSON.stringify(saved),oldStorage=memory(oldRaw),loaded=new x.Game(oldStorage);
+  assert.equal(loaded.storageOK,true);
+  for(const bad of ['not-an-array',['not-in-draft']]){
+    const corrupted=normal(saved);corrupted.run.battle.misplacedMarks=bad;
+    const raw=JSON.stringify(corrupted),store=memory(raw),rejected=new x.Game(store);
+    assert.equal(rejected.storageOK,false);
+    assert.equal(store.getItem(x.SAVE_KEY),raw);
+  }
+});
+
+test('窄版完整顯示失敗原因句，其他警告維持原操作列',()=>{
+  const x=renderedBattle('monster','teacher','hero'),g=x.game,b=g.run.battle,t=g.topic();
+  const first=t.bank.find(s=>s.text==='老師每天陪我們上課，也照顧我們的心情。');
+  const second=t.bank.find(s=>s.text==='放學後，老師還留在教室整理大家的作品。');
+  assert(first&&second);
+  b.required=[1];g.setTarget(1);b.enemy.hp=b.enemy.maxHp=1000;
+  b.draft=[cardFor(g,first,'reason-preview-first'),cardFor(g,second,'reason-preview-second')];
+  assert.equal(g.submit(),false);
+  let action=x.elements.get('action-zone').innerHTML;
+  assert.equal(x.elements.get('app').dataset.feedbackReason,'true');
+  assert.match(action,/class="action-layout has-failure-reason"><span class="failure-reason-preview" aria-hidden="true">草稿第 1、2 句不是這一段的句子。<\/span><div class="controls-scroll"/);
+  assert.match(action,/id="submit-button"[^>]*>提交段落/);
+  assert.match(action,/id="end-turn-button"[^>]*>結束回合/);
+  assert.match(action,/class="footer-feedback" aria-label="完整回饋：草稿第 1、2 句不是這一段的句子。/);
+
+  g.tell('能量不足，可以保留草稿，結束回合後繼續。','warn');
+  action=x.elements.get('action-zone').innerHTML;
+  assert.equal(x.elements.get('app').dataset.feedbackReason,'false');
+  assert.doesNotMatch(action,/has-failure-reason|failure-reason-preview/);
+  assert.match(action,/class="footer-feedback"/);
+});
+
+test('短視窗草稿分組標籤縮在可見區域且失敗原因列保留操作空間',()=>{
+  assert.match(html,/@media\(min-width:850px\) and \(max-height:640px\)\{\s*\.hand-group-label\{[^}]*min-height:0/);
+  assert.match(html,/@media\(max-width:849px\) and \(max-height:720px\)\{\s*\.hand-group-label\{[^}]*font-size:10px/);
+  assert.match(html,/@media\(max-width:849px\)\{\s*#app\[data-view=battle\]\[data-feedback-reason=true\]\{grid-template-rows:10% 36% 42% 12%\}/);
+  assert.match(html,/\.action-layout\.has-failure-reason\{grid-template-rows:minmax\(0,1fr\) 36px;gap:3px 7px\}/);
+});
+
+test('短窄視窗卡片說明列縮小內距但保留句子字級與工具列空間',()=>{
+  assert.match(html,/@media\(max-width:849px\) and \(max-height:720px\)\{\s*\.card-main\{gap:2px;padding:4px\}\s*\.card-effect\{line-height:1\.2;padding-top:2px\}/);
+  assert.match(html,/\.card-copy\{font-size:15px;line-height:1\.25;overflow-wrap:anywhere\}/);
+  assert.match(html,/@media\(max-width:849px\) and \(max-height:640px\)\{\s*\.card-main\{gap:2px;padding:4px\}/);
+  assert.match(html,/\.card-tools\{[^}]*min-height:44px\}/);
+  assert.match(html,/\.card-tools button\{[^}]*min-height:44px/);
+});
+
+test('窄版失敗原因列的操作按鈕能完整放進36px控制列',()=>{
+  assert.match(html,/\.controls-scroll button\{flex-shrink:0;min-height:36px\}/);
+  assert.match(html,/@media\(max-width:849px\)\{\s*\.action-layout\.has-failure-reason \.controls-scroll button\{padding-top:3px;padding-bottom:3px\}/);
+  assert.match(html,/\.action-layout\.has-failure-reason\{grid-template-rows:minmax\(0,1fr\) 36px;gap:3px 7px\}/);
+});
+
+
+test('短視窗卡片標記併入類型列並維持說明字級',()=>{
+  const metaStart=html.indexOf('<span class="card-meta"><span class="card-kind">');
+  const labelStart=html.indexOf('<span class="misplaced-label">',metaStart);
+  const metaEnd=html.indexOf('</span></span>',metaStart);
+  assert(metaStart>=0,'card kind and misplaced label share a metadata row');
+  assert(labelStart>metaStart&&labelStart<metaEnd,'misplaced label stays inside the metadata row');
+  assert.match(html,/.card-meta\{[^}]*display:flex[^}]*flex-wrap:wrap/);
+  assert.match(html,/.card-meta \.card-kind\{min-width:0;flex:1\}/);
+  assert.match(html,/.card-meta \.misplaced-label\{align-self:center\}/);
+  assert.match(html,/@media\(min-width:850px\) and \(max-height:640px\)\{\s*\.card-main\{gap:2px;padding:4px\}\s*\.card-effect\{font-size:12px;line-height:1\.05;padding-top:1px\}\s*\}/);
+  assert.match(html,/@media\(max-width:849px\) and \(max-height:720px\)\{\s*\.card-main\{gap:1px;padding:2px\}\s*\.card-effect\{font-size:12px;line-height:1\.05;padding-top:0\}\s*\}/);
 });
