@@ -5,21 +5,21 @@ import vm from 'node:vm';
 const html=fs.readFileSync(new URL('../game/index.html',import.meta.url),'utf8');
 const source=html.match(/<script id="game-code">([\s\S]*?)<\/script>/)[1];
 function memory(raw=null){const db=new Map(raw?[['pen-spire-save-v2',raw]]:[]);return{getItem:k=>db.get(k)??null,setItem:(k,v)=>db.set(k,v),db};}
-function boot(storage=memory()){const context=vm.createContext({console});vm.runInContext(source,context);return{...context.PenSpire,game:new context.PenSpire.Game(storage),storage};}
+function boot(storage=memory(),search=''){const context=vm.createContext({console,location:{search},URLSearchParams});vm.runInContext(source,context);return{...context.PenSpire,game:new context.PenSpire.Game(storage),storage};}
 function renderMapHTML(map){
   const elements=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{id,innerHTML:'',textContent:'',dataset:{},clientWidth:1280,addEventListener(){},focus(){},scrollIntoView(){}});return elements.get(id);};
   const document={getElementById:element,querySelectorAll:()=>[],addEventListener(){},activeElement:null};
   const context=vm.createContext({console,document,window:{localStorage:memory()},requestAnimationFrame:()=>0,cancelAnimationFrame(){},addEventListener(){},clearTimeout(){},setTimeout:()=>0,matchMedia:()=>({matches:false}),innerWidth:1280});
   vm.runInContext(source,context);assert(context.game.startRun('hero',271828));context.game.run.map=map;context.game.run.available=map[0].map(node=>node.id);context.game.run.visited=[];context.game.run.current=null;context.game.run.view='map';context.game.view='map';context.game.onChange();return elements.get('screen').innerHTML;
 }
-function battle(type='monster',topic='teacher',char='hero'){const x=boot();x.game.meta.wins=2;x.game.meta.hermit=true;x.game.startRun(char,123);x.game.run.current='0-0';x.game.startBattle(type,topic);return x;}
-function putParagraph(x,index){const g=x.game,b=g.run.battle,t=g.topic();g.setTarget(index);b.energy=3;b.hand=t.bank.filter(s=>s.allowed.includes(index)).map((s,i)=>({id:`fixture-${index}-${i}`,type:'material',topicId:t.id,bankId:s.id,kind:s.kind,sentence:s.text,allowed:s.allowed,level:0,damageSpent:false}));for(const c of [...b.hand])assert.equal(g.play(c.id),true);}
-function renderedBattle(type='monster',topic='teacher',char='hero'){
-  const elements=new Map(),listeners=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{id,innerHTML:'',textContent:'',dataset:{},clientWidth:1280,open:false,addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){},scrollIntoView(){}});return elements.get(id);};
-  const document={getElementById:element,querySelectorAll:()=>[],addEventListener:(type,listener)=>listeners.set(type,listener),activeElement:null};
-  const context=vm.createContext({console,document,window:{localStorage:memory()},requestAnimationFrame:()=>0,cancelAnimationFrame(){},addEventListener(){},clearTimeout(){},setTimeout:()=>0,matchMedia:()=>({matches:false}),innerWidth:1280});
-  vm.runInContext(source,context);const game=context.game;game.meta.wins=2;game.meta.hermit=true;assert(game.startRun(char,123));game.run.current='0-0';game.startBattle(type,topic);
-  return{game,elements,api:context.PenSpire,effects:context.PenSpireEffects,clickAction(action){const listener=listeners.get('click');assert.equal(typeof listener,'function','click handler registered');listener({target:{closest:selector=>selector==='button[data-action]'?{dataset:{action},disabled:false}:null}});}};
+function battle(type='monster',topic='teacher',char='hero',sceneEnabled=false){const x=boot();if(!sceneEnabled)x.game.beginScenePlayback=()=>false;x.game.meta.wins=2;x.game.meta.hermit=true;x.game.startRun(char,123);x.game.run.current='0-0';x.game.startBattle(type,topic);return x;}
+function putParagraph(x,index){const g=x.game,b=g.run.battle,t=g.topic();g.setTarget(index);b.hand=t.bank.filter(s=>s.allowed.includes(index)).map((s,i)=>({id:`fixture-${index}-${i}`,type:'material',topicId:t.id,bankId:s.id,kind:s.kind,sentence:s.text,allowed:s.allowed,level:0,damageSpent:false}));b.energy=Math.max(3,b.hand.length);for(const c of [...b.hand])assert.equal(g.play(c.id),true);}
+function renderedBattle(type='monster',topic='teacher',char='hero',sceneEnabled=false){
+  const elements=new Map(),listeners=new Map(),timers=[];let activeElement=null;const element=id=>{if(!elements.has(id))elements.set(id,{id,innerHTML:'',textContent:'',dataset:{},clientWidth:1280,open:false,addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){activeElement=this;},closest(){return null;},scrollIntoView(){}});return elements.get(id);};
+  const document={getElementById:element,querySelectorAll:()=>[],querySelector:()=>null,addEventListener:(type,listener,options={})=>{if(!listeners.has(type))listeners.set(type,[]);listeners.get(type).push({listener,options});},get activeElement(){return activeElement;}};
+  const context=vm.createContext({console,document,window:{localStorage:memory()},requestAnimationFrame:()=>0,cancelAnimationFrame(){},addEventListener(){},clearTimeout:id=>{if(timers[id-1])timers[id-1].cleared=true;},setTimeout:(fn,delay=0)=>{timers.push({fn,delay,cleared:false});return timers.length;},matchMedia:()=>({matches:false}),innerWidth:1280});
+  vm.runInContext(source,context);const game=context.game;if(!sceneEnabled)game.beginScenePlayback=()=>false;game.meta.wins=2;game.meta.hermit=true;assert(game.startRun(char,123));game.run.current='0-0';game.startBattle(type,topic);
+  return{game,elements,document,timers,api:context.PenSpire,effects:context.PenSpireEffects,listener(type,capture=true){return listeners.get(type)?.filter(entry=>!!entry.options?.capture===capture).at(-1)?.listener;},clickAction(action){const listener=listeners.get('click')?.filter(entry=>!entry.options?.capture).at(-1)?.listener;assert.equal(typeof listener,'function','click handler registered');listener({target:{closest:selector=>selector==='button[data-action]'?{dataset:{action},disabled:false}:null}});}};
 }
 function cardFor(game,s,id='fixture-card'){return{id,type:'material',topicId:game.topic().id,bankId:s.id,kind:s.kind,sentence:s.text,allowed:s.allowed,level:0,damageSpent:false};}
 const ATTACK_VALUES={a:6,claim:5,reason:6,example:5,effect:6,quote:5};
@@ -48,7 +48,7 @@ test('heal tactic stays out of the starter deck, caps healing, exhausts once, an
 test('heal can replace one random reward choice and can be bought for 24 bookmarks',()=>{const{game:g}=battle();assert(!g.run.deck.some(c=>c.type==='heal'));g.winBattle();assert.equal(g.run.reward.length,3);assert.equal(g.run.reward.filter(type=>type==='heal').length,1);assert(g.reward('heal'));assert.equal(g.run.deck.filter(c=>c.type==='heal').length,1);g.run.view=g.view='shop';g.run.gold=100;assert(g.buy('heal'));assert.equal(g.run.gold,76);assert.equal(g.run.deck.filter(c=>c.type==='heal').length,2);assert(g.run.shopBought.includes('heal'));assert(!g.buy('heal'));assert.equal(g.run.gold,76);});
 test('rendered cards label all nine effects, and heal appears in reward and shop screens',()=>{const{game:g,elements}=renderedBattle('monster','teacher','teacher'),t=g.topic(),b=g.run.battle,kinds=['a','b','claim','reason','example','step','summary','effect','quote'];b.hand=kinds.map(kind=>({id:`ui-${kind}`,type:'material',topicId:t.id,bankId:`ui-${kind}`,kind,sentence:`${t.topic} example ${kind}`,allowed:[0],level:0,damageSpent:false}));b.hand.push({id:'ui-heal',type:'heal',topicId:t.id,level:0,sentence:`先把〈${t.topic}〉的下一句想清楚。`});g.onChange();const html=elements.get('hand-zone').innerHTML;for(const label of ['攻擊 6','立即格擋 5','攻擊 5','立即格擋 4＋抽 1','回復 5 生命｜本場戰鬥耗盡'])assert(html.includes(label),label);g.run.reward=['heal','material','defend'];g.run.view=g.view='reward';g.onChange();assert(elements.get('screen').innerHTML.includes('喝口水'));assert(elements.get('screen').innerHTML.includes('回復 5 生命'));g.run.view=g.view='shop';g.onChange();assert(elements.get('screen').innerHTML.includes('喝口水'));assert(elements.get('screen').innerHTML.includes('24 書籤幣・購買'));});
 test('version 2 saves preserve heal and effect markers; older version 2 saves without them still load',()=>{const x=boot(),g=x.game;assert(g.startRun('hero',271828));g.run.view=g.view='shop';g.run.gold=100;assert(g.buy('heal'));const topic=x.TOPICS.find(t=>t.bank.some(s=>s.kind==='summary'));assert(g.startBattle('monster',topic.id));const summary=topic.bank.find(s=>s.kind==='summary'),b=g.run.battle;b.hand=[cardFor(g,summary,'summary-save')];assert(g.play('summary-save'));const saved=JSON.parse(x.storage.getItem(x.SAVE_KEY));assert.equal(saved.version,2);assert(saved.run.deck.some(c=>c.type==='heal'));assert(saved.run.shopBought.includes('heal'));assert.equal(saved.run.battle.draft.find(c=>c.id==='summary-save').drawApplied,true);assert.equal(saved.run.battle.draft.find(c=>c.id==='summary-save').appliedBlock,4);const restored=new x.Game(memory(JSON.stringify(saved)));assert(restored.storageOK);assert.equal(restored.run.battle.draft.find(c=>c.id==='summary-save').drawApplied,true);assert.equal(restored.run.battle.draft.find(c=>c.id==='summary-save').appliedBlock,4);const legacy=normal(saved);legacy.run.deck=legacy.run.deck.filter(c=>c.type!=='heal');legacy.run.shopBought=legacy.run.shopBought.filter(type=>type!=='heal');for(const pile of ['hand','draw','discard','draft']){legacy.run.battle[pile]=legacy.run.battle[pile].filter(c=>c.type!=='heal');for(const card of legacy.run.battle[pile]){delete card.drawApplied;delete card.appliedBlock;}}assert.equal(legacy.version,2);assert.equal(x.validRun(legacy.run),true);assert(new x.Game(memory(JSON.stringify(legacy))).storageOK);});
-test('an invalid draft cannot deal attack damage twice, and can be revised after feedback',()=>{const x=battle(),g=x.game,b=g.run.battle;b.enemy.hp=b.enemy.maxHp=1000;putParagraph(x,0);const expected=Math.floor(paragraphAttack(g,0)*.5);g.setTarget(3);assert.equal(g.submit(),false);assert.equal(b.enemy.hp,1000-expected);assert.equal(b.draft.length,3);g.submit();assert.equal(b.enemy.hp,1000-expected);g.setTarget(0);assert(g.submit());assert.equal(b.completed.length,1);assert.equal(b.draft.length,0);});
+test('an invalid draft cannot deal attack damage twice, and can be revised after feedback',()=>{const x=battle(),g=x.game,b=g.run.battle;b.enemy.hp=b.enemy.maxHp=1000;putParagraph(x,0);const expected=Math.floor(paragraphAttack(g,0)*.5);g.setTarget(3);assert.equal(g.submit(),false);assert.equal(b.enemy.hp,1000-expected);assert.equal(b.draft.length,g.topic().paragraphs[0].pattern.length);g.submit();assert.equal(b.enemy.hp,1000-expected);g.setTarget(0);assert(g.submit());assert.equal(b.completed.length,1);assert.equal(b.draft.length,0);});
 test('off-topic or wrong-paragraph sentences never complete a paragraph',()=>{const x=battle(),g=x.game,b=g.run.battle;putParagraph(x,0);b.draft[0].topicId='pencil';assert.equal(g.evaluate().valid,false);b.draft[0].topicId=g.topic().id;b.draft[0].allowed=[3];assert.equal(g.evaluate().valid,false);});
 test('boss is invulnerable to bypass: only four distinct ordered paragraphs win',()=>{const x=battle('boss'),g=x.game,b=g.run.battle;for(let i=0;i<100;i++)g.damage(10000);assert.equal(b.enemy.hp,85);assert.equal(g.finish(true),false);assert.equal(g.run.status,'active');for(let i=0;i<4;i++){putParagraph(x,i);assert(g.submit());if(i<3){assert.equal(g.run.status,'active');for(let k=0;k<20;k++)g.damage(10000);assert.equal(b.enemy.hp,(3-b.phase)*28+1);}}assert.equal(b.phase,4);assert.equal(b.completed.length,4);assert.equal(g.run.status,'won');assert.equal(g.meta.wins,3);const ink=g.meta.ink;assert.equal(g.finish(true),false);assert.equal(g.meta.ink,ink);});
 test('mage multiplier applies to sentence and direct attacks; hero has no bonus',()=>{for(const char of ['hero','mage']){const x=battle('monster','teacher',char),g=x.game,b=g.run.battle,expected=paragraphAttack(g,3);b.enemy.hp=b.enemy.maxHp=1000;b.required=[3];putParagraph(x,3);g.submit();assert.equal(1000-b.enemy.hp,Math.floor(expected*(char==='mage'?1.5:1)));b.completed=[{index:b.required[0],text:'完成段落'}];b.energy=3;b.hand=[{id:'direct',type:'strike',topicId:g.topic().id,level:0,sentence:'直接攻擊'}];g.play('direct');assert.equal(1000-b.enemy.hp,Math.floor(expected*(char==='mage'?1.5:1))+10*(char==='mage'?1.5:1));}assert.equal(boot().CHARACTERS.find(c=>c.id==='tank').hp,112);});
@@ -132,13 +132,13 @@ test('native format practice uses 5/3/3 parts; first-clear ink cannot be farmed'
 test('25-course ledger and layout constraints exist; layout is not falsely browser-verified',()=>{const ledger=fs.readFileSync(new URL('../course-coverage.md',import.meta.url),'utf8');assert.equal((ledger.match(/^\| g[3456]-/gm)||[]).length,25);const layout=JSON.parse(fs.readFileSync(new URL('../layout-plan.json',import.meta.url),'utf8'));assert.equal(layout.viewport_profiles.length,7);assert(!layout.relations.some(r=>r.result==='error'));assert(['ready','verified'].includes(layout.status));if(layout.status==='ready')assert.equal(layout.verification.status,'not_run');});
 test('damaged card metadata is rejected without overwriting a recoverable original save',()=>{const x=battle();const raw=JSON.parse(x.storage.getItem(x.SAVE_KEY));const c=[...raw.run.battle.hand,...raw.run.battle.draw].find(c=>c.type==='material');delete c.allowed;const original=JSON.stringify(raw),store=memory(original),restored=new x.Game(store);assert.equal(restored.storageOK,false);restored.startRun('hero',9);assert.equal(store.getItem(x.SAVE_KEY),original);});
 test('full deck shop purchase does not deduct gold or consume the offer',()=>{const{game:g}=battle();g.run.view=g.view='shop';while(g.run.deck.length<80)g.run.deck.push({id:'full-'+g.run.deck.length,type:'material',level:0});const gold=g.run.gold;assert(!g.buy('material'));assert.equal(g.run.gold,gold);assert(!g.run.shopBought.includes('material'));});
-for(const topic of boot().TOPICS)test(`all four ${topic.id} paragraphs can complete the actual boss`,()=>{const x=battle('boss',topic.id);for(let i=0;i<4;i++){putParagraph(x,i);assert(x.game.submit());}assert.equal(x.game.run.status,'won');assert.equal(x.game.run.archive.at(-1).paragraphs.length,4);});
+for(const topic of boot().TOPICS)test(`all four ${topic.id} paragraphs can complete the actual boss`,()=>{const x=battle('boss',topic.id,'hero',topic.id==='pencil');for(let i=0;i<4;i++){putParagraph(x,i);assert(x.game.submit());if(topic.id==='pencil')assert(x.game.finishScenePlayback());}assert.equal(x.game.run.status,'won');assert.equal(x.game.run.archive.at(-1).paragraphs.length,4);});
 test('elite partial/full breaks scale only unspent attacks in invalid drafts',()=>{for(const hits of [1,2]){const x=battle('elite'),g=x.game,b=g.run.battle;b.required=[1,3];b.enemy.hp=b.enemy.maxHp=1000;putParagraph(x,1);g.submit();if(hits===2){putParagraph(x,3);g.submit();}putParagraph(x,0);g.setTarget(2);const before=b.enemy.hp,expected=Math.floor(paragraphAttack(g,0)*(hits===1?.75:1));assert.equal(g.submit(),false);assert.equal(before-b.enemy.hp,expected);const after=b.enemy.hp;g.submit();assert.equal(b.enemy.hp,after);}});
 
-test('sorting selected cards changes the actual submitted sentence order without energy or damage mutation',()=>{const x=battle('boss'),g=x.game,b=g.run.battle;putParagraph(x,0);const ids=b.draft.map(c=>c.id),energy=b.energy,hp=b.enemy.hp;assert(g.reorder('draft',ids[0],2));assert.equal(b.draft[2].id,ids[0]);assert(!g.evaluate().valid);assert.equal(b.energy,energy);assert.equal(b.enemy.hp,hp);assert(g.reorder('draft',ids[0],0));const text=b.draft.map(c=>c.sentence).join('');assert(g.submit());assert.equal(b.completed[0].text,text);});
+test('sorting selected cards changes the actual submitted sentence order without energy or damage mutation',()=>{const x=battle('boss'),g=x.game,b=g.run.battle;putParagraph(x,0);const ids=b.draft.map(c=>c.id),last=ids.length-1,energy=b.energy,hp=b.enemy.hp;assert(g.reorder('draft',ids[0],last));assert.equal(b.draft[last].id,ids[0]);assert(!g.evaluate().valid);assert.equal(b.energy,energy);assert.equal(b.enemy.hp,hp);assert(g.reorder('draft',ids[0],0));const text=b.draft.map(c=>c.sentence).join('');assert(g.submit());assert.equal(b.completed[0].text,text);});
 test('sorting at zero energy preserves all card metadata and works in both pools',()=>{const x=battle(),g=x.game,b=g.run.battle;putParagraph(x,0);b.draft[0].damageSpent=true;b.energy=0;const cards=normal(b.draft),before=b.enemy.hp;assert(g.reorder('draft',cards[0].id,2));for(const c of b.draft)assert.deepEqual(normal(c),cards.find(x=>x.id===c.id));assert.equal(b.energy,0);assert.equal(b.enemy.hp,before);g.endTurn();b.energy=0;const hand=normal(b.hand);assert(g.reorder('hand',hand[0].id,hand.length-1));assert.equal(b.hand.at(-1).id,hand[0].id);assert.equal(b.energy,0);});
 test('invalid sorting destinations, ids, pools and no-op moves leave both arrays unchanged',()=>{const{game:g}=battle(),b=g.run.battle;const before=normal(b),id=b.hand[0].id;for(const [pool,key,pos]of [['hand',id,-1],['hand',id,10],['hand',id,0.1],['hand','missing',1],['draft',id,0],['draw',id,1],['hand',id,0],['__proto__',id,0]])assert.equal(g.reorder(pool,key,pos),false);assert.deepEqual(normal(b),before);g.menu();assert.equal(g.reorder('hand',id,1),false);});
-test('a repeated or cancelled reorder cannot charge energy or duplicate cards',()=>{const x=battle(),g=x.game,b=g.run.battle;putParagraph(x,0);const id=b.draft[0].id,energy=b.energy;assert(g.reorder('draft',id,2));for(let i=0;i<10;i++)assert(!g.reorder('draft',id,2));assert.equal(b.draft.length,3);assert.equal(new Set(b.draft.map(c=>c.id)).size,3);assert.equal(b.energy,energy);});
+test('a repeated or cancelled reorder cannot charge energy or duplicate cards',()=>{const x=battle(),g=x.game,b=g.run.battle;putParagraph(x,0);const id=b.draft[0].id,energy=b.energy;assert(g.reorder('draft',id,2));for(let i=0;i<10;i++)assert(!g.reorder('draft',id,2));const n=g.topic().paragraphs[0].pattern.length;assert.equal(b.draft.length,n);assert.equal(new Set(b.draft.map(c=>c.id)).size,n);assert.equal(b.energy,energy);});
 test('sorting spent invalid draft never resets attack accounting',()=>{const x=battle('elite'),g=x.game,b=g.run.battle;b.enemy.hp=b.enemy.maxHp=1000;putParagraph(x,0);g.setTarget(1);assert(!g.submit());const hp=b.enemy.hp,attacks=b.draft.filter(c=>ATTACK_VALUES[c.kind]);assert(attacks.length>0);assert(attacks.every(c=>c.damageSpent));g.reorder('draft',b.draft[0].id,2);g.submit();assert.equal(b.enemy.hp,hp);assert(attacks.every(c=>c.damageSpent));});
 test('sorting preserves current-turn refunds, previous-turn no-refund and hand cap',()=>{const x=battle('boss'),g=x.game,b=g.run.battle;putParagraph(x,0);g.reorder('draft',b.draft[0].id,2);const id=b.draft[0].id,energy=b.energy;assert(g.undo(id));assert.equal(b.energy,energy+1);g.endTurn();const old=b.draft[0].id;g.reorder('draft',old,1);const nextEnergy=b.energy;assert(g.undo(old));assert.equal(b.energy,nextEnergy);while(b.hand.length<10)b.hand.push({...b.hand[0],id:'cap-'+b.hand.length});const selected=b.draft[0].id,snapshot=normal(b.draft);assert(!g.undo(selected));assert.deepEqual(normal(b.draft),snapshot);});
 test('selected notes participate in order and refund once without creating a deck card',()=>{const x=battle('boss'),g=x.game,b=g.run.battle;putParagraph(x,0);b.draft.pop();b.energy=1;const s=g.topic().bank.find(s=>!b.draft.some(c=>c.bankId===s.id));assert(g.note(s.id));const note=b.draft.at(-1),hand=b.hand.length;assert(g.reorder('draft',note.id,0));assert(g.undo(note.id));assert.equal(b.energy,1);assert.equal(b.hand.length,hand);assert(!g.undo(note.id));});
@@ -207,14 +207,12 @@ test('11 個題目的普通怪與菁英怪都能湊出每個弱點段落（種�
   }
 });
 
-test('頭目起始牌組必含前兩段與第三段前兩位句子（種子 1～40）',()=>{
+test('頭目起始牌組依段落順序放滿 8 句素材（三句段落＝前兩段＋第三段前兩句；種子 1～40）',()=>{
   const{game,TOPICS}=boot();game.meta.wins=2;
   for(const topic of TOPICS)for(let seed=1;seed<=40;seed++){
     const b=seededBattle(game,'boss',topic.id,seed),cards=materialCards(b);
     assert.equal(cards.length,8,topic.id+'/seed '+seed+': starting materials');
-    assert(matchingMaterialCards(cards,topic,0),topic.id+'/seed '+seed+'/paragraph 0');
-    assert(matchingMaterialCards(cards,topic,1),topic.id+'/seed '+seed+'/paragraph 1');
-    assert(matchingMaterialCards(cards,topic,2,2),topic.id+'/seed '+seed+'/paragraph 2 prefix');
+    let left=8;for(let i=0;i<topic.paragraphs.length&&left>0;i++){const k=Math.min(topic.paragraphs[i].pattern.length,left);assert(matchingMaterialCards(cards,topic,i,k),topic.id+'/seed '+seed+'/paragraph '+i+' prefix '+k);left-=k;}
   }
 });
 
@@ -251,10 +249,10 @@ test('brave 普通怪可只用牌組句子完成弱點段落，不呼叫隨手�
   assert.equal(noteCalls,0);
   assert(b.completed.some(paragraph=>paragraph.index===index));
 });
-test('草稿三句時擋住素材牌且戰術牌仍可使用',()=>{
+test('草稿滿上限時擋住素材牌且戰術牌仍可使用',()=>{
   const x=battle(),g=x.game,b=g.run.battle,t=g.topic();
-  const draft=t.bank.slice(0,3).map((s,i)=>({...cardFor(g,s,'draft-limit-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
-  const material=cardFor(g,t.bank[3],'draft-limit-fourth'),tactic=g.run.deck.find(c=>c.type==='defend');
+  const draft=t.bank.slice(0,boot().DRAFT_LIMIT).map((s,i)=>({...cardFor(g,s,'draft-limit-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
+  const material=cardFor(g,t.bank[draft.length],'draft-limit-fourth'),tactic=g.run.deck.find(c=>c.type==='defend');
   assert(tactic,'牌組含有防禦戰術牌');
   b.draft=draft;b.hand=[material,tactic];b.draw=b.draw.filter(c=>c.id!==tactic.id);b.discard=b.discard.filter(c=>c.id!==tactic.id);b.energy=3;
   const before={energy:b.energy,hand:normal(b.hand),draft:normal(b.draft)};
@@ -264,13 +262,13 @@ test('草稿三句時擋住素材牌且戰術牌仍可使用',()=>{
   assert.deepEqual(normal(b.draft),before.draft);
   assert(g.notice.includes('草稿已滿'));
   assert.equal(g.play(tactic.id),true);
-  assert.equal(b.draft.length,3);
+  assert.equal(b.draft.length,boot().DRAFT_LIMIT);
   assert(!b.hand.some(c=>c.id===tactic.id));
 });
 
-test('草稿三句時隨手筆記不消耗次數或能量',()=>{
+test('草稿滿上限時隨手筆記不消耗次數或能量',()=>{
   const x=battle(),g=x.game,b=g.run.battle,t=g.topic();
-  b.draft=t.bank.slice(0,3).map((s,i)=>({...cardFor(g,s,'draft-limit-note-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
+  b.draft=t.bank.slice(0,boot().DRAFT_LIMIT).map((s,i)=>({...cardFor(g,s,'draft-limit-note-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
   b.energy=2;
   const sentence=t.bank.find(s=>!b.draft.some(c=>c.bankId===s.id));
   assert(sentence);
@@ -279,22 +277,22 @@ test('草稿三句時隨手筆記不消耗次數或能量',()=>{
   assert.equal(b.energy,2);
 });
 
-test('戰鬥畫面顯示三句上限並鎖住第四張素材牌',()=>{
+test('戰鬥畫面顯示草稿上限（目前四句）並鎖住多出的素材牌',()=>{
   const x=renderedBattle(),g=x.game,b=g.run.battle,t=g.topic();
-  b.draft=t.bank.slice(0,3).map((s,i)=>({...cardFor(g,s,'draft-limit-render-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
-  const locked=cardFor(g,t.bank[3],'draft-limit-locked');
+  const L=x.api.DRAFT_LIMIT;assert.equal(L,4);b.draft=t.bank.slice(0,L).map((s,i)=>({...cardFor(g,s,'draft-limit-render-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
+  const locked=cardFor(g,t.bank[L],'draft-limit-locked');
   b.hand=[locked];b.energy=3;g.onChange();
   const screen=x.elements.get('screen').innerHTML,hand=x.elements.get('hand-zone').innerHTML,index=hand.indexOf('data-card-id="draft-limit-locked"'),end=hand.indexOf('</article>',index);
-  assert(hand.includes('已選 3/3 句'));
+  assert(hand.includes('已選 4/4 句'));
   assert(index>=0&&end>index);
   const card=hand.slice(index,end);
   assert(card.includes('aria-disabled="true"'));
-  assert(card.includes('已選三句'));
+  assert(card.includes('已選四句'));
   assert(!hand.includes('/6 句'));
   assert(!hand.includes('已選六句'));
 });
 
-test('五句舊存檔仍可載入但加句要等撤回至兩句',()=>{
+test('五句舊存檔仍可載入但加句要等撤回到上限以下',()=>{
   const x=battle(),g=x.game,b=g.run.battle,t=g.topic();
   b.draft=t.bank.slice(0,5).map((s,i)=>({...cardFor(g,s,'draft-limit-old-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
   assert(g.save());
@@ -316,25 +314,30 @@ test('五句舊存檔仍可載入但加句要等撤回至兩句',()=>{
   assert.equal(rb.draft.length,3);
 });
 
-test('勇者坦克法師在需要兩句或三句的段落都顯示固定三句上限',()=>{
+test('勇者坦克法師在需要兩句、三句或四句的段落都顯示同一個草稿上限',()=>{
   const topics=boot().TOPICS,topic=topics.find(t=>t.paragraphs.some(p=>p.pattern.length===2)&&t.paragraphs.some(p=>p.pattern.length===3));
   assert(topic,'題庫同時有兩句與三句段落');
-  for(const char of ['hero','tank','mage'])for(const count of [2,3]){
+  const L=boot().DRAFT_LIMIT;for(const char of ['hero','tank','mage'])for(const count of [2,3]){
     const x=renderedBattle('monster',topic.id,char),g=x.game,index=g.topic().paragraphs.findIndex(p=>p.pattern.length===count);
     assert.notEqual(index,-1);
     assert.equal(g.topic().paragraphs[index].pattern.length,count);
     assert(g.setTarget(index));
-    assert.match(x.elements.get('hand-zone').innerHTML,/已選 0\/3 句/);
+    assert(x.elements.get('hand-zone').innerHTML.includes('已選 0/'+L+' 句'));
   }
 });
-test('隨手筆記按鈕在草稿三句時停用、兩句時可用',()=>{
-  for(const count of [2,3]){
+test('草稿上限等於所有題目最長段落句數，每個弱點段都放得下',()=>{
+  const x=boot(),longest=Math.max(...x.TOPICS.flatMap(t=>t.paragraphs.map(p=>p.pattern.length)));
+  assert.equal(x.DRAFT_LIMIT,longest);
+  for(const t of x.TOPICS)t.paragraphs.forEach((p,i)=>assert(p.pattern.length<=x.DRAFT_LIMIT,`${t.id} 第 ${i+1} 段 ${p.pattern.length} 句超過草稿上限 ${x.DRAFT_LIMIT}`));
+});
+test('隨手筆記按鈕在草稿滿上限時停用、少一句時可用',()=>{
+  const L=boot().DRAFT_LIMIT;for(const count of [L-1,L]){
     const x=renderedBattle(),g=x.game,b=g.run.battle,t=g.topic();
     b.draft=t.bank.slice(0,count).map((s,i)=>({...cardFor(g,s,'note-button-'+count+'-'+i),paidCost:1,playedRound:b.round,appliedBlock:0,drawApplied:false}));
     b.energy=3;g.onChange();
     const html=x.elements.get('action-zone').innerHTML,button=html.match(/<button\b(?=[^>]*\bid="note-button")[^>]*>/)?.[0];
     assert(button,'隨手筆記按鈕有渲染');
-    assert.equal(/\sdisabled(?:\s|>)/.test(button),count===3);
+    assert.equal(/\sdisabled(?:\s|>)/.test(button),count===L);
   }
 });
 test('11 個題目對應指定動畫集與完整播放網址',()=>{
@@ -749,7 +752,7 @@ function renderS1P5Motion(char='hero',reduced=false){
   const elements=new Map(),listeners=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{id,innerHTML:'',textContent:'',dataset:{},clientWidth:1280,open:false,addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){},scrollIntoView(){}});return elements.get(id);};
   const document={getElementById:element,querySelectorAll:()=>[],addEventListener:(type,listener)=>listeners.set(type,listener),activeElement:null};
   const context=vm.createContext({console,document,window:{localStorage:memory()},requestAnimationFrame:()=>0,cancelAnimationFrame(){},addEventListener(){},clearTimeout(){},setTimeout:()=>0,matchMedia:query=>({matches:reduced&&query.includes('prefers-reduced-motion: reduce')}),innerWidth:1280});
-  vm.runInContext(source,context);const game=context.game;game.meta.wins=2;game.meta.hermit=true;assert(game.startRun(char,123));game.run.current='0-0';game.startBattle('monster','teacher');return{game,elements,effects:context.PenSpireEffects,api:context.PenSpire,storage:game.storage};
+  vm.runInContext(source,context);const game=context.game;game.beginScenePlayback=()=>false;game.meta.wins=2;game.meta.hermit=true;assert(game.startRun(char,123));game.run.current='0-0';game.startBattle('monster','teacher');return{game,elements,effects:context.PenSpireEffects,api:context.PenSpire,storage:game.storage};
 }
 function s1p5ActorMarkup(markup,id){const at=markup.indexOf('id="'+id+'"');assert(at>=0,id+' exists');const start=markup.lastIndexOf('<div',at),end=markup.indexOf('</div>',at);return markup.slice(start,end+6);}
 
@@ -933,6 +936,13 @@ test('試玩網址參數只接受 unlock=all 且不改變既有解鎖條件',()=
   }
   const broken=vm.createContext({console,location:{get search(){throw new Error('location unreadable');}}});
   vm.runInContext(source,broken);assert.equal(broken.PenSpire.trialEnabled(),false);
+});
+
+test('試玩模式加 topic 參數時每場戰鬥都用指定題目；沒有試玩或題目不存在時照舊隨機',()=>{
+  const fight=search=>{const x=boot(memory(),search);assert(x.game.startRun('hero',7));const ids=[];for(let i=0;i<6;i++){x.game.run.battle=null;x.game.run.view='map';x.game.startBattle('monster');ids.push(x.game.run.battle.topicId);}return ids;};
+  assert.deepEqual(fight('?unlock=all&topic=pencil'),Array(6).fill('pencil'));
+  assert(fight('?topic=pencil').some(id=>id!=='pencil'),'沒有 unlock=all 時不生效');
+  assert(fight('?unlock=all&topic=nope').some(id=>id!=='pencil'),'題目不存在時照舊隨機');
 });
 
 test('試玩模式讀取舊存檔後完整操作仍不呼叫任何存檔寫入',()=>{
@@ -1270,7 +1280,7 @@ test('大廳由上而下排列五張角色卡，窄版角色區可橫向捲動',
 test('沒有 AudioContext 時仍能完整走過一場戰鬥並收到遊戲音效事件',()=>{
   const context=vm.createContext({console});vm.runInContext(source,context);assert.equal(context.AudioContext,undefined);
   const game=new context.PenSpire.Game(memory()),events=[];game.meta.wins=2;game.meta.hermit=true;assert(game.startRun('hero',123));game.run.current='0-0';assert(game.startBattle('monster','teacher'));game.onSound=id=>events.push(id);
-  const x={game,api:context.PenSpire};game.run.battle.enemy.hp=1000;putParagraph(x,0);assert.equal(game.submit(),true);assert.equal(game.run.view,'battle');game.run.battle.block=0;assert(game.endTurn());
+  const x={game,api:context.PenSpire};game.run.battle.enemy.hp=1000;putParagraph(x,0);assert.equal(game.submit(),true);assert.equal(game.run.view,'battle');assert(game.finishScenePlayback());game.run.battle.block=0;assert(game.endTurn());
   for(const id of ['card','submitOk','hit','hurt','turn'])assert(events.includes(id),'missing '+id+' event');
 });
 
@@ -1470,10 +1480,13 @@ test('四個題目的段名、句子、種類順序與書桌教學集符合核�
   assert.deepEqual(normal(TEACHING_VIDEOS.desk),['g4-05-method-skeleton']);
 });
 
-test('其餘七題的題目資料與改版前備份完全一致',async()=>{
+test('其餘六題的題目資料與改版前備份完全一致；我的老師只有第一段改成四句',async()=>{
   const {createHash}=await import('node:crypto');
-  const unchanged=normal(boot().TOPICS).filter(topic=>!['desk','environment','reading','humility'].includes(topic.id)).map(({id,topic,genre,paragraphs})=>({id,topic,genre,paragraphs:paragraphs.map(({label,units})=>({label,units}))}));
-  assert.equal(createHash('sha256').update(JSON.stringify(unchanged)).digest('hex'),'b2c36e035890ee1b13c80e1c622a68a4fbbfc3db72c9b8ca80f2e7a63a01afd7');
+  const unchanged=normal(boot().TOPICS).filter(topic=>!['desk','environment','reading','humility','teacher'].includes(topic.id)).map(({id,topic,genre,paragraphs})=>({id,topic,genre,paragraphs:paragraphs.map(({label,units})=>({label,units}))}));
+  assert.equal(createHash('sha256').update(JSON.stringify(unchanged)).digest('hex'),'eb0321ab219e874f9493542ad192208d7f704033de03d483ccc109eb1d5896b0');
+  const teacher=normal(boot().TOPICS).find(topic=>topic.id==='teacher');
+  assert.deepEqual(teacher.paragraphs.map(p=>p.units.length),[4,3,3,3]);
+  assert.deepEqual(teacher.paragraphs[0].units,[['a','我的老師個子小小的，頭髮短短的。'],['a','她戴著圓圓的眼鏡，總是帶著笑容。'],['a','她常穿著輕便的球鞋，在教室裡走來走去。'],['b','看著老師的笑容，我覺得很安心。']]);
 });
 
 test('四題新句照順序成立，指定的舊順序與舊組合不成立',()=>{
@@ -1977,4 +1990,170 @@ test('菁英戰的另一個未完成弱點段落可觸發換段提示',()=>{
   assert.equal(g.submit(),false);
   assert.ok(g.notice.startsWith('這幾句是完整的一段，但不是第 3 段，換別段試試看。'),g.notice);
   assert.deepEqual(normal(b.misplacedMarks),normal(b.draft.map(card=>card.bankId)));
+});
+
+test('客廳十二句情境標籤與 TOPICS 的句子功能和 bankId 一致',()=>{
+  const {TOPICS,SCENE_TAGS}=boot(),topic=TOPICS.find(item=>item.id==='pencil');
+  const expected=[
+    ['pencil-0-0','a','door',null],['pencil-0-1','a','rug',null],['pencil-0-2','b',null,'relax'],
+    ['pencil-1-0','a','tv',null],['pencil-1-1','a','window',null],['pencil-1-2','b',null,'sunbeam'],
+    ['pencil-2-0','a','sofa',null],['pencil-2-1','a','bookcase',null],['pencil-2-2','b',null,'reading'],
+    ['pencil-3-0','a','family',null],['pencil-3-1','b',null,'hearts'],['pencil-3-2','b',null,'sparkles']
+  ];
+  assert.equal(topic.bank.length,12);assert.equal(Object.keys(SCENE_TAGS).length,73);
+  for(const[bankId,kind,prop,mood]of expected){const card=topic.bank.find(item=>item.id===bankId);assert(card,bankId+' exists');assert.equal(card.kind,kind,bankId+' kind');assert.deepEqual(normal(SCENE_TAGS[bankId]),{prop,mood},bankId+' scene tag');}
+});
+
+test('情境特徵、ReLU 權重計分與逐項解釋符合三個固定案例',()=>{
+  const api=boot(),checkExplain=(features)=>{for(const param of Object.keys(api.SCENE_WEIGHTS)){const explain=api.sceneExplain(features,param),sum=Object.values(normal(explain.contributions)).reduce((a,b)=>a+b,0);assert.ok(Math.abs(sum+explain.bias-explain.preActivation)<1e-12,param+' explain sum');assert.equal(explain.relu,Math.max(0,explain.preActivation));assert.equal(explain.score,Math.min(1,explain.relu));}};
+  const first=api.sceneFeatures({cards:[{bankId:'pencil-0-0',kind:'a'},{bankId:'pencil-1-0',kind:'a'},{bankId:'pencil-0-2',kind:'b'}],success:true,misplacedBankIds:[]});
+  assert.deepEqual(normal(first),{facts:2/3,feelings:1/3,props:2/3,repeat:0,misplaced:0,success:1,fail:0});
+  const firstScores=normal(api.sceneScores(first));assert.ok(Math.abs(firstScores.warmth-(1/3+.3-.2))<1e-12);assert.equal(firstScores.clarity,1);assert.ok(Math.abs(firstScores.celebrate-.4)<1e-12);assert.equal(firstScores.pause,0);checkExplain(first);
+  const second=api.sceneFeatures({cards:[{bankId:'pencil-0-0',kind:'a'},{bankId:'pencil-0-1',kind:'a'},{bankId:'pencil-1-0',kind:'a'}],success:false,misplacedBankIds:[]});
+  assert.deepEqual(normal(api.sceneScores(second)),{warmth:0,clarity:1,celebrate:0,pause:.5});checkExplain(second);
+  const repeated=api.sceneFeatures({cards:[{bankId:'pencil-0-0',kind:'a'},{bankId:'pencil-0-0',kind:'a'}],success:false,misplacedBankIds:['pencil-0-0']});
+  assert.deepEqual(normal(repeated),{facts:1,feelings:0,props:1/3,repeat:1,misplaced:1,success:0,fail:1});assert.equal(api.sceneScores(repeated).clarity,0);assert.equal(api.sceneScores(repeated).pause,1);checkExplain(repeated);
+});
+
+test('勇者同草稿與同已公開失敗標記不因目標段改變情境參數或疊層 HTML',()=>{
+  const attempt=target=>{const x=renderedBattle('monster','pencil','hero',true),g=x.game,b=g.run.battle;g.setTarget(target);b.enemy.hp=10000;b.draft=pencilParagraphCards(g,1,'same-public-draft');assert.equal(g.submit(),false);const scene=g.scenePlayback,markups=[x.api.sceneOverlayMarkup(scene,0)];for(let i=0;i<scene.cards.length;i++){assert(g.advanceScenePlayback(2000*(i+1)));markups.push(x.api.sceneOverlayMarkup(scene,2000*(i+1)));}return{scene,markups,topic:g.topic()};};
+  const first=attempt(0),second=attempt(2);assert.deepEqual(normal(first.scene.features),normal(second.scene.features));assert.deepEqual(normal(first.scene.scores),normal(second.scene.scores));assert.deepEqual(first.markups,second.markups);
+  for(let index=0;index<first.markups.length;index++){const markup=first.markups[index],attrs=renderedAttributes(markup),stageLabel=attrs.find(value=>value.startsWith('情境：')),visibleCount=index===first.markups.length-1?first.scene.cards.length:Math.min(first.scene.cards.length,index+1),visibleLabel='情境：'+first.scene.cards.slice(0,visibleCount).map(card=>card.sentence).join('');assert.equal(attrs.length,2);assert(attrs.includes('情境'));assert.equal(stageLabel,visibleLabel);assert.match(markup,/role="dialog" aria-modal="true" aria-label="情境"/);assert.match(markup,/id="scene-auto-close"/);assert.doesNotMatch(markup,/seen|pen-spire-scene-prefs|pencil-\d-\d|第\s*\d+\s*段|pattern/i);for(const paragraph of first.topic.paragraphs)assert(!markup.includes(paragraph.label));}
+});
+
+test('播放時阻擋戰鬥操作，跳過只清除記憶體情境、不改提交後狀態',()=>{
+  const {game:g}=renderedBattle('monster','pencil','hero',true),b=g.run.battle;g.setTarget(2);b.enemy.hp=10000;b.draft=pencilParagraphCards(g,1,'blocked-scene-draft');assert.equal(g.submit(),false);assert(g.scenePlayback);const settled=normal(g.run),cardId=b.hand[0]?.id;
+  assert.equal(g.activeBattle(),false);assert.equal(g.play(cardId),false);assert.equal(g.submit(),false);assert.equal(g.endTurn(),false);assert.equal(g.note('pencil-0-0'),false);assert.equal(g.mulligan(),false);assert.equal(g.reorder('draft',b.draft[0].id,1),false);assert.equal(g.setTarget(0),false);assert.equal(g.openHelp(),false);assert.deepEqual(normal(g.run),settled);
+  assert.equal(g.finishScenePlayback(),true);assert.equal(g.scenePlayback,null);assert.equal(g.activeBattle(),true);assert.deepEqual(normal(g.run),settled);
+});
+
+test('情境播放與自動示範、非客廳題目及存檔規則隔離',()=>{
+  const prepare=(search='')=>{const x=boot(memory(),search),g=x.game;g.meta.wins=2;g.meta.hermit=true;assert(g.startRun('hero',2468));g.run.current='0-0';assert(g.startBattle('monster','pencil'));const b=g.run.battle;b.target=0;b.enemy.hp=b.enemy.maxHp=1000;b.energy=3;b.draft=pencilParagraphCards(g,0,'scene-invariant');assert.equal(g.submit(),true);return{x,g};};
+  const regular=prepare(),auto=prepare('?auto=1');assert(regular.g.scenePlayback);assert.equal(auto.g.scenePlayback,null);assert.deepEqual(normal(regular.g.run),normal(auto.g.run));assert.equal(regular.x.storage.getItem(regular.x.SAVE_KEY),auto.x.storage.getItem(auto.x.SAVE_KEY));assert(!regular.x.storage.getItem(regular.x.SAVE_KEY).includes('scenePlayback'));
+  const other=battle('monster','desk','hero');putParagraph(other,0);assert.equal(other.game.submit(),true);assert.equal(other.game.scenePlayback,null);
+});
+
+test('勝利結算先顯示戰場情境，結束後才切換獎勵畫面',()=>{
+  const x=renderedBattle('monster','pencil','hero',true),g=x.game,b=g.run.battle;b.enemy.hp=1;g.setTarget(0);b.draft=pencilParagraphCards(g,0,'winning-scene');assert.equal(g.submit(),true);assert.equal(g.view,'reward');assert.equal(g.scenePlayback.pendingWin,true);
+  const playing=x.elements.get('screen').innerHTML;assert(playing.includes('id="paragraph-scene-overlay"'));assert(playing.includes('class="battle-stage'));assert(!playing.includes('data-action="reward"'));
+  assert.equal(g.finishScenePlayback(),true);const finished=x.elements.get('screen').innerHTML;assert(!finished.includes('paragraph-scene-overlay'));assert(finished.includes('data-action="reward"'));
+});
+
+test('情境版面覆蓋頁首下方遊戲區，舞台維持 16:9 且字幕在舞台下方',()=>{
+  const start=html.indexOf('.paragraph-scene{'),end=html.indexOf('.actor{',start),css=html.slice(start,end);
+  assert.match(css,/\.paragraph-scene\{position:fixed;inset:8% 0 0/);
+  assert.match(css,/\.scene-room\{[^}]*width:min\(96vw,124\.4vh,760px\)[^}]*min-height:330px;aspect-ratio:16 \/ 9/);
+  assert.match(css,/@media\(max-width:849px\)\{\.paragraph-scene\{top:10%/);
+  assert.match(css,/\.scene-room\{width:min\(calc\(100vw - 24px\),700px\);height:auto/);
+  assert.match(css,/\.scene-caption\{position:relative/);
+  assert.doesNotMatch(css,/\.scene-caption\{[^}]*max-height|\.scene-caption\{[^}]*overflow:hidden/);
+  assert.equal(Math.min(390-24,700),366);
+});
+
+test('情境結束後焦點回到可操作控制，勝利沿用結果畫面焦點',()=>{
+  const {sceneFocusTarget}=boot();
+  assert.equal(sceneFocusTarget({submitEnabled:true,firstHandCardAvailable:true}),'submit-button');
+  assert.equal(sceneFocusTarget({submitEnabled:false,firstHandCardAvailable:true}),'first-hand-card');
+  assert.equal(sceneFocusTarget({submitEnabled:false,firstHandCardAvailable:false}),'end-turn-button');
+  assert.equal(sceneFocusTarget({pendingWin:true,submitEnabled:false,firstHandCardAvailable:true}),'result');
+  assert.match(html,/focusTarget=sceneFocusTarget\(/);
+});
+
+test('像素情境圖以既有調色盤繪製，減少動態時直接呈現靜止完整畫面',()=>{
+  const api=boot(),art=api.SCENE_PIXEL_ART,ids=['door','rug','tv','window','sofa','bookcase','relax','sunbeam','reading','family','hearts','sparkles'];
+  for(const id of ids){assert.equal(art[id].length,16,id+' rows');assert(art[id].every(row=>row.length===16),id+' width');assert([...art[id].join('')].every(key=>key==='.'||Object.hasOwn(api.ICON_V2_ART.palette,key)),id+' palette');const svg=api.scenePixelSvg(id);assert.match(svg,/viewBox="0 0 16 16"/);assert(!/\b(?:title|data-[\w-]+)\s*=/.test(svg));}
+  assert([...art.sunbeam.join('')].every(key=>key==='.'||key==='y'));
+  assert(art.window.join('').includes('g')&&art.window.join('').includes('t'));
+  assert(art.sofa.join('').includes('G')&&art.sofa.join('').includes('t'));
+  assert(new Set([...art.bookcase.join('')].filter(key=>key!=='.')).size>=6);
+  const scene={cards:[{bankId:'pencil-0-0',kind:'a',sentence:'客廳在一進門的地方'},{bankId:'pencil-0-1',kind:'a',sentence:'家具擺得整整齊齊'}],misplacedBankIds:[],scores:{clarity:.5,warmth:0,celebrate:0,pause:.5},startedAt:1000,endingStartedAt:1000,phase:'ending',reducedMotion:true};
+  assert.deepEqual(normal(api.sceneFrameState(scene,1001)),{elapsed:1,duration:2000,index:1,final:true});const markup=api.sceneOverlayMarkup(scene,1001);assert(markup.includes('客廳在一進門的地方家具擺得整整齊齊'));assert(markup.includes('草稿保留，可再修改'));
+});
+
+function paragraphSceneFixture({search='',preferences,bankIds=['pencil-0-0','pencil-1-0'],storage:providedStorage,demo=false}={}){
+  const storage=providedStorage||memory();if(preferences!==undefined)storage.setItem('pen-spire-scene-prefs-v1',typeof preferences==='string'?preferences:JSON.stringify(preferences));
+  const x=boot(storage,search),g=x.game;g.meta.wins=2;g.meta.hermit=true;assert(g.startRun('hero',4917));g.run.current='0-0';assert(g.startBattle('monster','pencil'));
+  const cards=bankIds.map(id=>{const card=g.topic().bank.find(item=>item.id===id);assert(card,id+' fixture card');return{bankId:card.id,kind:card.kind,sentence:card.text};});
+  if(demo)g.demo={auto:false};
+  assert(g.beginScenePlayback({cards,success:false,misplacedBankIds:[]}));return{...x,cards};
+}
+function startParagraphSceneClock(scene,now=1000,reducedMotion=false){scene.startedAt=now;scene.reducedMotion=reducedMotion;if(reducedMotion){scene.phase='ending';scene.index=scene.cards.length-1;scene.endingStartedAt=now;scene.autoCloseStartedAt=scene.seenAtStart&&scene.autoClose?now:null;}else{scene.phase='items';scene.index=0;scene.itemStartedAt=now;}}
+function trackedMemory(){const base=memory(),writes=[];return{...base,writes,setItem(key,value){writes.push(key);base.setItem(key,value);}};}
+
+test('情境逐張依序顯示；每件卡停兩秒後進入下一件與結尾',()=>{
+  const{game:g,sceneOverlayMarkup,sceneFrameState}=paragraphSceneFixture({bankIds:['pencil-0-0','pencil-1-0']}),scene=g.scenePlayback,[first,second]=scene.cards;startParagraphSceneClock(scene,1000);
+  assert.deepEqual(normal(sceneFrameState(scene,2999)),{elapsed:1999,duration:2000,index:0,final:false});const firstMarkup=sceneOverlayMarkup(scene,2999);assert(firstMarkup.includes(first.sentence));assert(!firstMarkup.includes(second.sentence));assert(!firstMarkup.includes('scene-continue-button'));
+  assert(g.advanceScenePlayback(3000));assert.equal(scene.index,1);assert.deepEqual(normal(sceneFrameState(scene,3000)),{elapsed:0,duration:2000,index:1,final:false});const secondMarkup=sceneOverlayMarkup(scene,3000);assert(secondMarkup.includes(first.sentence+second.sentence));assert(secondMarkup.includes('class="scene-caption" aria-hidden="true">'+second.sentence));assert(!secondMarkup.includes('scene-continue-button'));
+  assert(g.advanceScenePlayback(5000));assert.equal(scene.phase,'ending');assert.equal(scene.index,1);assert(sceneOverlayMarkup(scene,5000).includes('id="scene-continue-button"'));assert.equal(scene.autoCloseStartedAt,null);
+});
+
+test('減少動態時直接顯示所有物件並進入結尾，第一次仍不自動關閉',()=>{
+  const x=paragraphSceneFixture({bankIds:['pencil-0-0','pencil-1-0','pencil-2-0']}),scene=x.game.scenePlayback;startParagraphSceneClock(scene,1000,true);const frame=x.sceneFrameState(scene,1000),markup=x.sceneOverlayMarkup(scene,1000);
+  assert.equal(frame.index,2);assert.equal(frame.final,true);assert.equal(scene.phase,'ending');assert.equal(scene.autoCloseStartedAt,null);assert(markup.includes(scene.cards.map(card=>card.sentence).join('')));assert(markup.includes('id="scene-continue-button"'));
+});
+
+test('第一次必須手動關閉；關閉後記錄看過，同卡不同順序仍是同一組',()=>{
+  const x=paragraphSceneFixture({preferences:{version:1,autoClose:true,seen:[]}}),{game:g,storage,cards,SCENE_PREFS_KEY,SAVE_KEY,Game}=x,scene=g.scenePlayback;startParagraphSceneClock(scene,1000);assert.equal(scene.seenAtStart,false);
+  g.advanceScenePlayback(3000);g.advanceScenePlayback(5000);assert.equal(scene.autoCloseStartedAt,null);assert.equal(g.scenePrefs.seen.includes(scene.sceneKey),false);assert.equal(g.finishScenePlayback(),true);
+  const prefs=JSON.parse(storage.getItem(SCENE_PREFS_KEY));assert.equal(prefs.autoClose,true);assert.deepEqual(prefs.seen,[scene.sceneKey]);const saved=JSON.parse(storage.getItem(SAVE_KEY));assert.deepEqual(Object.keys(saved).sort(),['meta','run','selected','version']);assert(!JSON.stringify(saved).includes(scene.sceneKey));
+  const reversed=new Game(storage);assert(reversed.beginScenePlayback({cards:[...cards].reverse(),success:false,misplacedBankIds:[]}));assert.equal(reversed.scenePlayback.seenAtStart,true);assert.equal(reversed.scenePlayback.sceneKey,scene.sceneKey);
+  const changed=new Game(storage),other=[cards[0],{bankId:'pencil-2-0',kind:'a',sentence:'不同句子'}];assert(changed.beginScenePlayback({cards:other,success:false,misplacedBankIds:[]}));assert.equal(changed.scenePlayback.seenAtStart,false);
+});
+
+test('看過且勾選才會倒數兩秒；取消勾選會停止倒數',()=>{
+  const x=paragraphSceneFixture({preferences:{version:1,autoClose:true,seen:[]}}),{game:g,sceneKeyForCards,sceneAutoCloseReady}=x,scene=g.scenePlayback;scene.sceneKey=sceneKeyForCards('pencil',scene.cards);g.scenePrefs.seen=[scene.sceneKey];scene.seenAtStart=true;startParagraphSceneClock(scene,1000);g.advanceScenePlayback(3000);g.advanceScenePlayback(5000);
+  assert.equal(scene.autoCloseStartedAt,5000);assert.equal(sceneAutoCloseReady(scene,true,6999),false);assert.equal(sceneAutoCloseReady(scene,true,7000),true);assert.equal(sceneAutoCloseReady(scene,false,7000),false);
+  g.setSceneAutoClose(false);assert.equal(scene.autoCloseStartedAt,null);assert.equal(sceneAutoCloseReady(scene,true,9000),false);g.setSceneAutoClose(true);assert.notEqual(scene.autoCloseStartedAt,null);
+});
+
+test('情境偏好格式錯誤時使用預設值，讀取失敗不拋錯，已看紀錄最多三百筆',()=>{
+  const bad=paragraphSceneFixture({preferences:'{bad json'});assert.deepEqual(normal(bad.game.scenePrefs),{version:1,autoClose:false,seen:[]});
+  const throwing={getItem(key){if(key==='pen-spire-save-v2')return null;throw Error('read failed');},setItem(){throw Error('write failed');}};const x=boot(throwing);assert.deepEqual(normal(x.game.scenePrefs),{version:1,autoClose:false,seen:[]});assert.doesNotThrow(()=>x.game.setSceneAutoClose(true));
+  const store=memory(),seen=Array.from({length:305},(_,index)=>'scene-'+index);store.setItem('pen-spire-scene-prefs-v1',JSON.stringify({version:1,autoClose:true,seen}));const trimmed=boot(store);assert.equal(trimmed.game.scenePrefs.seen.length,300);assert.equal(trimmed.game.scenePrefs.seen[0],'scene-5');assert.equal(trimmed.game.scenePrefs.seen.at(-1),'scene-304');trimmed.game.rememberScene({sceneKey:'scene-new'});assert.equal(trimmed.game.scenePrefs.seen.length,300);assert.equal(trimmed.game.scenePrefs.seen[0],'scene-6');assert.equal(trimmed.game.scenePrefs.seen.at(-1),'scene-new');
+});
+
+test('試玩、示範與 storageOK 關閉時只保留記憶體偏好、不寫入新鍵',()=>{
+  const trialStore=trackedMemory(),trial=paragraphSceneFixture({search:'?unlock=all&topic=pencil',storage:trialStore});trialStore.writes.length=0;trial.game.setSceneAutoClose(true);startParagraphSceneClock(trial.game.scenePlayback,1000);trial.game.advanceScenePlayback(3000);trial.game.advanceScenePlayback(5000);trial.game.finishScenePlayback();assert.equal(trialStore.writes.filter(key=>key===trial.SCENE_PREFS_KEY).length,0);assert.equal(trial.game.scenePrefs.seen.length,1);assert(trial.game.beginScenePlayback({cards:trial.cards,success:false,misplacedBankIds:[]}));assert.equal(trial.game.scenePlayback.seenAtStart,true);
+  const demoStore=trackedMemory(),demo=paragraphSceneFixture({storage:demoStore,demo:true});demoStore.writes.length=0;demo.game.setSceneAutoClose(true);startParagraphSceneClock(demo.game.scenePlayback,1000);for(let i=0;i<demo.game.scenePlayback.cards.length;i++)demo.game.advanceScenePlayback(3000+2000*i);demo.game.finishScenePlayback();assert.equal(demoStore.writes.filter(key=>key===demo.SCENE_PREFS_KEY).length,0);assert.equal(demo.game.scenePrefs.seen.length,1);
+  const autoDemo=paragraphSceneFixture();autoDemo.game.scenePlayback=null;autoDemo.game.demo={auto:true};assert.equal(autoDemo.game.beginScenePlayback({cards:autoDemo.cards,success:false,misplacedBankIds:[]}),false);
+  const unavailableStore=trackedMemory(),unavailable=paragraphSceneFixture({storage:unavailableStore});unavailableStore.writes.length=0;unavailable.game.storageOK=false;unavailable.game.setSceneAutoClose(true);unavailable.game.finishScenePlayback();assert.equal(unavailableStore.writes.filter(key=>key===unavailable.SCENE_PREFS_KEY).length,0);
+});
+
+test('情境畫面定時器每兩秒前進、按鍵焦點受限，結尾 Enter 防誤觸五百毫秒',()=>{
+  const x=renderedBattle('monster','pencil','hero',true),g=x.game,topic=g.topic(),cards=['pencil-0-0','pencil-1-0','pencil-2-0'].map(id=>{const card=topic.bank.find(item=>item.id===id);return{bankId:card.id,kind:card.kind,sentence:card.text};});
+  assert(g.beginScenePlayback({cards,success:false,misplacedBankIds:[]}));g.changed();const scene=g.scenePlayback;assert.equal(x.document.activeElement?.id,'scene-auto-close');assert(x.elements.get('screen').innerHTML.includes(cards[0].sentence));assert(!x.elements.get('screen').innerHTML.includes(cards[1].sentence));
+  const click=x.listener('click',true),input=x.elements.get('scene-auto-close'),checkboxEvent={target:{closest(selector){return selector==='#scene-auto-close'?{}:null;}},preventDefault(){this.prevented=true;},stopImmediatePropagation(){}};click(checkboxEvent);assert.equal(scene.index,0,'勾選框不會推進卡片');
+  const blank={closest(selector){return selector==='#paragraph-scene-overlay'?{}:null;}},clickBlank=()=>click({target:blank,preventDefault(){},stopImmediatePropagation(){}});clickBlank();assert.equal(scene.index,1,'點情境畫面會顯示下一件');assert(x.elements.get('screen').innerHTML.includes(cards[1].sentence));
+  const fireItemTimer=()=>{scene.itemStartedAt=Date.now()-2000;g.onChange();const timer=x.timers.filter(item=>!item.cleared&&item.delay===1).at(-1);assert(timer,'due item timer scheduled');timer.fn();};fireItemTimer();assert.equal(scene.index,2);assert(x.elements.get('screen').innerHTML.includes(cards[2].sentence));fireItemTimer();assert.equal(scene.phase,'ending');assert.equal(x.document.activeElement?.id,'scene-continue-button');
+  const keydown=x.listener('keydown',true),button=x.elements.get('scene-continue-button'),dispatchKey=(key,target,shiftKey=false)=>{const event={key,target,shiftKey,preventDefault(){this.prevented=true;},stopImmediatePropagation(){}};keydown(event);return event;};
+  dispatchKey('Tab',button);assert.equal(x.document.activeElement?.id,'scene-auto-close');dispatchKey('Tab',input,true);assert.equal(x.document.activeElement?.id,'scene-continue-button');
+  clickBlank();assert.equal(g.scenePlayback,scene,'blank click does not close ending');
+  scene.endingStartedAt=Date.now();dispatchKey('Enter',button);assert.equal(g.scenePlayback,scene,'first 500ms ignores Enter');scene.endingStartedAt=Date.now()-500;dispatchKey('Enter',button);assert.equal(g.scenePlayback,null,'Enter on continue closes after guard');assert(g.scenePrefs.seen.includes(scene.sceneKey));
+  assert(g.beginScenePlayback({cards,success:false,misplacedBankIds:[]}));g.changed();const escapeEvent=dispatchKey('Escape',x.elements.get('scene-auto-close'));assert(escapeEvent.prevented);assert.equal(g.scenePlayback,null,'Esc closes at any time');
+  assert(g.beginScenePlayback({cards,success:false,misplacedBankIds:[]}));g.changed();g.advanceScenePlayback(Date.now());g.advanceScenePlayback(Date.now());g.advanceScenePlayback(Date.now());assert.equal(g.scenePlayback.phase,'ending');click({target:{closest(selector){return selector==='#scene-continue-button'?{}:null;}},preventDefault(){},stopImmediatePropagation(){}});assert.equal(g.scenePlayback,null,'點繼續可關閉情境');
+  g.scenePrefs.autoClose=true;g.scenePrefs.seen.push(scene.sceneKey);assert(g.beginScenePlayback({cards,success:false,misplacedBankIds:[]}));g.changed();const autoScene=g.scenePlayback;g.advanceScenePlayback(Date.now());g.advanceScenePlayback(Date.now());g.advanceScenePlayback(Date.now());assert.equal(autoScene.phase,'ending');assert.notEqual(autoScene.autoCloseStartedAt,null);autoScene.autoCloseStartedAt=Date.now()-2000;g.onChange();const autoTimer=x.timers.filter(item=>!item.cleared&&item.delay===1).at(-1);assert(autoTimer,'auto-close timer scheduled');autoTimer.fn();assert.equal(g.scenePlayback,null,'seen scene closes after the auto-close delay');
+});
+test('五題60句情境標籤與題庫種類、道具前綴一致',()=>{
+  const {game:g,SCENE_TAGS,SCENE_ITEM_ART}=boot();assert(g.startRun('hero',915));let count=0;const seen=new Set();
+  for(const topicId of ['teacher','campus','trip','brave','special']){g.startBattle('monster',topicId);const topic=g.topic();assert.equal(topic.bank.length,topicId==='teacher'?13:12,topicId+' bank size');for(const card of topic.bank){const tag=SCENE_TAGS[card.id];assert(tag,card.id+' tag');assert(!seen.has(card.id),card.id+' duplicate');seen.add(card.id);const item=tag.prop||tag.mood;assert(item,card.id+' has one item');assert(item.startsWith(topicId+'-'),card.id+' item prefix');assert(SCENE_ITEM_ART[item],item+' art mapping');if(card.kind==='a'){assert.equal(tag.prop,item,card.id+' fact uses prop');assert.equal(tag.mood,null,card.id+' fact has no mood');}else if(card.kind==='b'){assert.equal(tag.prop,null,card.id+' feeling has no prop');assert.equal(tag.mood,item,card.id+' feeling uses mood');}else assert.fail(card.id+' unexpected kind '+card.kind);count++;}}
+  assert.equal(count,61);assert.equal(seen.size,61);assert.equal(Object.keys(SCENE_ITEM_ART).length,61);assert.equal(Object.keys(SCENE_TAGS).length,73);assert.deepEqual(normal(SCENE_TAGS['teacher-0-0']),{prop:'teacher-short-hair',mood:null});assert.deepEqual(normal(SCENE_TAGS['teacher-0-3']),{prop:null,mood:'teacher-reassuring-light'});assert.deepEqual(normal(SCENE_TAGS['campus-3-2']),{prop:null,mood:'campus-watering-student'});
+});
+
+test('新道具圖都是16×16像素圖，調色盤與專屬人物圖正確',()=>{
+  const api=boot(),art=api.SCENE_PIXEL_ART,ids=Object.keys(api.SCENE_ITEM_ART);assert.equal(new Set(ids).size,61);
+  for(const id of ids){const key=api.SCENE_ITEM_ART[id]||id;assert(art[key],id+' art exists');const pixels=art[key];assert.equal(pixels.length,16,key+' rows');assert(pixels.every(row=>row.length===16),key+' columns');assert(pixels.every(row=>[...row].every(c=>c==='.'||Object.hasOwn(api.ICON_V2_ART.palette,c))),key+' palette');assert(api.scenePixelSvg(key).includes('viewBox="0 0 16 16"'));if(api.SCENE_ITEM_ART[id])assert(html.includes('.scene-item--'+id),id+' CSS position');}
+  for(const key of ['teacher-podium','teacher-walking','walking-child','student-watering','trip-line','bouncing-child','guide-garden','hatted-child','small-xiaoan','green-backpack','xiaoan-newfriend','shining-xiaoan','sweaty-podium','speaking-podium','protect-friend','garden-discussion','grow-together']){const rows=art[key];assert(rows.slice(0,6).join('').includes('s'),key+' head');assert(/[GBrt]/.test(rows.slice(6,12).join('')),key+' body');assert(rows.slice(12).join('').includes('d'),key+' feet');}
+  assert.notDeepEqual(normal(art['sapling-standing']),normal(art['sapling-held']));assert.notDeepEqual(normal(art['sapling-standing']),normal(art['sapling-tall']));assert.notDeepEqual(normal(art['sapling-held']),normal(art['sapling-tall']));
+  const bubble=art['wordless-dialogue'];assert([...bubble.slice(2,4)].every(row=>[...row.slice(4,12)].every(pixel=>pixel==='.')),'dialogue bubble interior stays empty');
+});
+
+test('六題使用對應舞台並播放，其他五題不播放',()=>{
+  const expected={pencil:'living',teacher:'classroom',brave:'classroom',campus:'campus',special:'campus',trip:'farm'},api=boot();assert.deepEqual(normal(api.SCENE_STAGES),expected);
+  for(const [topicId,stage]of Object.entries(expected)){const x=renderedBattle('monster',topicId,'hero',true),g=x.game,topic=g.topic(),cards=topic.bank.slice(0,3).map(card=>({bankId:card.id,kind:card.kind,sentence:card.text}));assert(g.beginScenePlayback({cards,success:false,misplacedBankIds:[]}),topicId+' starts');assert.equal(g.scenePlayback.stage,stage);const markup=x.api.sceneOverlayMarkup(g.scenePlayback,1000);assert(markup.includes('class="scene-room scene-room--'+stage+'"'),topicId+' stage class');if(stage==='classroom')for(const name of ['scene-classroom-window','scene-classroom-board','scene-classroom-podium','scene-classroom-desk--r2c'])assert(markup.includes(name),name);if(stage==='campus')for(const name of ['scene-campus-building','scene-campus-gate','scene-campus-flowerbed','scene-campus-field','scene-campus-path'])assert(markup.includes(name),name);if(stage==='farm')for(const name of ['scene-farm-hills','scene-farm-fields','scene-farm-garden','scene-farm-path'])assert(markup.includes(name),name);}
+  for(const topicId of ['desk','environment','reading','humility','book']){const x=renderedBattle('monster',topicId,'hero',true),g=x.game,card=g.topic().bank[0];assert.equal(g.beginScenePlayback({cards:[{bankId:card.id,kind:card.kind,sentence:card.text}],success:false,misplacedBankIds:[]}),false,topicId+' remains unchanged');}
+});
+
+test('記敘文五題的勇者情境不因目標段而洩漏提示',()=>{
+  const attempt=(topicId,target)=>{const x=renderedBattle('monster',topicId,'hero',true),g=x.game,b=g.run.battle,topic=g.topic(),source=topic.paragraphs[1].pattern,used=new Set();g.setTarget(target);b.enemy.hp=10000;b.draft=source.map((kind,index)=>{const item=topic.bank.find(card=>card.kind===kind&&card.allowed.includes(1)&&!used.has(card.id));assert(item,topicId+' fixture '+kind);used.add(item.id);return{id:'public-'+index,type:'material',topicId,bankId:item.id,kind:item.kind,sentence:item.text,allowed:item.allowed,level:0,damageSpent:false};});assert.equal(g.submit(),false,topicId+' failed submission');const scene=g.scenePlayback;assert(scene,topicId+' scene starts');const markups=[x.api.sceneOverlayMarkup(scene,0)];for(let i=0;i<scene.cards.length;i++){assert(g.advanceScenePlayback(2000*(i+1)));markups.push(x.api.sceneOverlayMarkup(scene,2000*(i+1)));}return{notice:g.notice,markups,topic};};
+  for(const topicId of ['teacher','campus','trip','brave','special']){const first=attempt(topicId,0),second=attempt(topicId,3);assert.equal(first.notice.replace(/\u7b2c\s*\d+\s*\u6bb5/g,'\u7b2cX\u6bb5'),second.notice.replace(/\u7b2c\s*\d+\s*\u6bb5/g,'\u7b2cX\u6bb5'),topicId+' public failure reason');assert.deepEqual(first.markups,second.markups,topicId+' every playback step');for(const markup of first.markups){assert.doesNotMatch(markup,/第\s*\d+\s*段|pattern/i);assert(!markup.includes(first.topic.genre));const structural=markup.replace(/>[^<]*</g,'><').replace(/aria-label="[^"]*"/g,'');for(const paragraph of first.topic.paragraphs)assert(!structural.includes(paragraph.label),topicId+' paragraph label');}}
 });
